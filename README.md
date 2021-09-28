@@ -15,7 +15,7 @@ Systém repozitářů kopíruje systém kanálů na Discordu, který vymyslel P�
 Tým se skládá se 3 členů:
 - xsmahe01 ([ceskyDJ](https://github.com/ceskyDJ)) - vedoucí týmu
 - xhavli56 ([omnitex](https://github.com/omnitex))
-- xosine00
+- xosine00 ([TenebrisCZ](https://github.com/TenebrisCZ))
 
 ## Informační soubory
 
