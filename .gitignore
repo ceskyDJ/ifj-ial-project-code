@@ -1,0 +1,16 @@
+# CMake build help files
+cmake-build-debug/
+
+# Help files
+*.o
+*.zip
+*.tar.gz
+
+# Binaries in src/
+# TODO
+
+# Help files in test/
+# TODO
+
+# Binaries in test/
+# TODO
