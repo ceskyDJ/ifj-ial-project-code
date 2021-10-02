@@ -1,0 +1,14 @@
+# Turn on automatic reviewer choosing and assignment
+addReviewers: true
+
+# Automatic assign pull request to its author
+addAssignees: author
+
+# Set of available reviewers
+reviewers:
+  - ceskyDJ
+  - omnitex
+  - TenebrisCZ
+
+# Limit of assigned reviewers
+numberOfReviewers: 1
