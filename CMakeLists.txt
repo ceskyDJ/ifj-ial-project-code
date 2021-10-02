@@ -9,5 +9,4 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_COMPILER gcc)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -pedantic -Wall -Wextra -fsanitize=address")
 
-# TODO
-#add_executable()
+add_executable(ifj21_compiler src/main.c)
