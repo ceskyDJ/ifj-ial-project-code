@@ -6,8 +6,8 @@ cmake-build-debug/
 *.zip
 *.tar.gz
 
-# Binaries in src/
-# TODO
+# Binaries of src/
+bin/
 
 # Help files in test/
 # TODO
