@@ -18,43 +18,47 @@ Je jako email -> má předmět a tělo. Předmět by měl být jasný, stručný
 Pokud se commit týká určitého modulu, jeho název se uvede na začátek předmětu:
 - port_control: move configuring of RSS from generic_port_configurer
 
-Pokud commit souvisí s určitým issue (úkolem) v Githubu, přidat na konec předmětu **každého** takového commitu `#n`, kde n je číslo daného úkolu:
+Pokud commit souvisí s určitým issue (úkolem) v Githubu, přidat na konec předmětu **každého** takového commitu `#n`, kde `n` je číslo daného úkolu:
 - vector_proc: implement optional Bohrian vector filtering #22
 
 (číslo úkolu lze vidět za názvem úkolu, když si ho rozkliknu, pod názvem v přehledu otevřených úkolů nebo také v URL samotného úkolu)
 
 Tělo commitu není povinné, ale pokud commit přidává/upravuje něco netriviálního, je lepší změny odůvodnit a **uvést do kontextu**. Raději popisovat záměr, důvod pro změny, než obsah změn (ten vidím v kódu). Např.:
 
-> This patch fixes vulnerability CVE-2017-0002. See, that we are fixing
+```
+This patch fixes vulnerability CVE-2017-0002. See, that we are fixing
 only single path through the code. If we fix both paths we would introduce
 a double free error.
+```
 
-> This commit is preparation for future modification where local
+```
+This commit is preparation for future modification where local
 data and worker statistics are not part of worker context but
 they are moved to runtime of mitigation rule.
+```
 
 Pokud by tělo commitu mělo být hodně dlouhé, pak commit přidává/mění něco velmi složitého -> určitě by to šlo **rozbít na menší, lépe stravitelné změny**, které by šly popsat lépe.
 
 Vzorový commit by pak mohl vypadat takto:
-> ansible: determine nosync_hours automatically
-\
-\
-> The default nosync_hours value is overriden by the inventary value.
-\
-\
+```
+*ansible: determine nosync_hours automatically*
+
+The default nosync_hours value is overriden by the inventary value.
+
 However, variables defined inside of a playbook have higher priority
 than variables from inventories. Thus, we have to drop the 10 hours
 constant.
-
+```
 nebo takto
-> appfs_aggregator: collect all values per label
-\
-\
+```
+*appfs_aggregator: collect all values per label*
+
 The label_value_info now keeps all parsed particular values and not just
 their aggregations.
+```
 
 ## Vývojové větve
-Domluva je zhruba taková, že `main` bude větev, ze které se bude vycházet (vytvořím novou větev na základě `main`)  a zase do ní navracet (merge oné větve zase do `main`). Tedy žádné `developement` apod. větve, protože náš `main` může být developement i "release" větev zároveň. Příklad:
+Domluva je zhruba taková, že `main` bude větev, ze které se bude vycházet (vytvořím novou větev na základě `main`) a zase do ní navracet (merge oné větve zase do `main`). Tedy žádné `developement` apod. větve, protože náš `main` může být developement i "release" větev zároveň. Příklad:
 ```
 main--------------------------------------------------------- ...
          \            \      /    \           /           /
@@ -69,14 +73,16 @@ Na cizí větve se nesahá, teda pokud se nedomluvíme, že někdo něco přeber
 Až budu mít něco, co chci prezentovat ostatním nebo i jen něco, co stojí za diskusi (či ji přímo vyžaduje), tak vytvořím pull request do `main`.
 (Git sám při prvním push nové větve nabídne, jak nastavit remote a poté i vypíše link na vytvoření pull requestu)
 
-Na `main` se tedy nesahá jinak než přes pull requesty (jakmile se něco schválí, tak se udělá merge to `main` a je to)
+Na `main` se tedy nesahá jinak než přes pull requesty (jakmile se něco schválí, tak se udělá merge do `main` a je to)
 
-Do komentáře pull requestu, který řeší a uzavírá určitý issue (úkol) číslo n, doplnit následující:
-- Closes #n
+Do pull requestu se napíše vhodný titulek a popis změn. Pro svázání s úkolem se do popisu uvede odkaz na úkol:
+```
+Související úkol:
+- issue #n
+```
+Místo `issue` lze uvést i `task`. Pokud se má úkol po úspěšném začlenění pull requestu uzavřít, mohou být použity i [direktivy Githubu](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword)(`close`, `fix`, `resolve`...)
 
-Popř. existují i jiná [klíčová slova](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue)
-
-Takto se úkol po uzavření pull requestu označí jako splněný i v projektu a není třeba to řešit ručně.
+Konverzace u pull requestů uzavírá jejich autor! :P
 
 ### Interaktivní rebase (*Základní znalost Vimu nutností!*)
 
