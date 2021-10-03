@@ -1,0 +1,37 @@
+name: 'Automation | Pull request'
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+
+jobs:
+  # Assign pull request to its author and choose and set reviewer
+  auto-assign-author-and-reviewer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: kentaro-m/auto-assign-action@v1.2.0
+
+  # Copy properties from linked issue from pull request description
+  # (if at least one issue is linked). Properties are labels
+  # and milestones
+  copy-properties-from-issue:
+    if: ${{ github.event.action == 'opened' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ceskyDJ/pr-set-issue-properties@v1.2.2
+        with:
+          way: 'body'
+          issues-close: false
+
+  # Add pull request shortcut to project column
+  # It automatically steps forward to next columns,
+  # so we can see its progress from one place
+  add-to-project:
+    if: ${{ github.event.action == 'opened' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: alex-page/github-project-automation-plus@v0.8.1
+        with:
+          project: IFJ & IAL projekt
+          column: In progress
+          repo-token: ${{ secrets.PROJECT_AUTOMATION_TOKEN }}
