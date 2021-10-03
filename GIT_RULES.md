@@ -16,12 +16,15 @@ Je jako email -> má předmět a tělo. Předmět by měl být jasný, stručný
 - change way the system responds to invalid requests
 
 Pokud se commit týká určitého modulu, jeho název se uvede na začátek předmětu:
-- port_control: move configuring of RSS from generic_port_configurer
+```
+port_control: move configuring of RSS from generic_port_configurer
+```
 
 Pokud commit souvisí s určitým issue (úkolem) v Githubu, přidat na konec předmětu **každého** takového commitu `#n`, kde `n` je číslo daného úkolu:
-- vector_proc: implement optional Bohrian vector filtering #22
-
-(číslo úkolu lze vidět za názvem úkolu, když si ho rozkliknu, pod názvem v přehledu otevřených úkolů nebo také v URL samotného úkolu)
+```
+vector_proc: implement optional Bohrian vector filtering #22
+```
+Číslo úkolu lze vidět za názvem úkolu, když si ho rozkliknu, pod názvem v přehledu otevřených úkolů nebo také v URL samotného úkolu.
 
 Tělo commitu není povinné, ale pokud commit přidává/upravuje něco netriviálního, je lepší změny odůvodnit a **uvést do kontextu**. Raději popisovat záměr, důvod pro změny, než obsah změn (ten vidím v kódu). Např.:
 
@@ -41,7 +44,7 @@ Pokud by tělo commitu mělo být hodně dlouhé, pak commit přidává/mění n
 
 Vzorový commit by pak mohl vypadat takto:
 ```
-*ansible: determine nosync_hours automatically*
+ansible: determine nosync_hours automatically
 
 The default nosync_hours value is overriden by the inventary value.
 
@@ -51,7 +54,7 @@ constant.
 ```
 nebo takto
 ```
-*appfs_aggregator: collect all values per label*
+appfs_aggregator: collect all values per label
 
 The label_value_info now keeps all parsed particular values and not just
 their aggregations.
@@ -68,19 +71,27 @@ main--------------------------------------------------------- ...
 ```
 Na cizí větve se nesahá, teda pokud se nedomluvíme, že někdo něco přebere nebo poupraví, ale jinak *moje větev, moje teritorium*.
 
-## Pull request
+## Pull request (zkratka PR)
 
 Až budu mít něco, co chci prezentovat ostatním nebo i jen něco, co stojí za diskusi (či ji přímo vyžaduje), tak vytvořím pull request do `main`.
-(Git sám při prvním push nové větve nabídne, jak nastavit remote a poté i vypíše link na vytvoření pull requestu)
+Git sám při prvním push nové větve nabídne, jak nastavit remote a poté i vypíše link na vytvoření pull requestu.
 
-Na `main` se tedy nesahá jinak než přes pull requesty (jakmile se něco schválí, tak se udělá merge do `main` a je to)
+Pokud mám něco značně nedokončeného či mám jen zárodek a chci dát najevo, že se jedná o první nástřel/návrh, tak místo klasického PR vytvořím [draft pull requestu](https://github.blog/2019-02-14-introducing-draft-pull-requests/). Ten pak lze zplnohodnotnit na klasický PR.
 
-Do pull requestu se napíše vhodný titulek a popis změn. Pro svázání s úkolem se do popisu uvede odkaz na úkol:
+Na `main` se tedy nesahá jinak než přes pull requesty (jakmile se něco schválí, tak se udělá merge do `main` a je to).
+
+Do samotného pull requestu se napíše vhodný titulek a popis změn (toto jako snad jediné budeme psát česky, je to interně, pro nás, pro účely diskuse a review).
+
+Při vytváření pull requestu se zaklikne `Enable auto-merge` a vybere se druh `merge-commit`, což vyvolá výzvu pro vyplnění titulku a těla merge commitu. Předvyplněný obsah je potřeba srozumitelně **přepsat**, aby stylem odpovídal normálnímu commitu.
+
+Pro svázání pull requestu s úkolem se do popisu PR uvede odkaz na úkol:
 ```
 Související úkol:
 - issue #n
 ```
-Místo `issue` lze uvést i `task`. Pokud se má úkol po úspěšném začlenění pull requestu uzavřít, mohou být použity i [direktivy Githubu](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword)(`close`, `fix`, `resolve`...)
+Místo `issue` lze uvést i `task`.
+
+Pokud se má úkol po úspěšném začlenění pull requestu uzavřít, mohou být použity i [direktivy Githubu](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue#linking-a-pull-request-to-an-issue-using-a-keyword) (`close`, `fix`, `resolve`...).
 
 Konverzace u pull requestů uzavírá jejich autor! :P
 
