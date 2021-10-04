@@ -1,0 +1,53 @@
+--- is_it_ok.sh	2021-10-05 00:50:19.664769278 +0200
++++ is_it_ok.edited.sh	2021-10-05 01:20:00.798025727 +0200
+@@ -121,14 +121,7 @@
+ 
+ #   0) Priprava testdir a overeni serveru
+ if [[ -d $2 ]]; then
+-  read -p "Do you want to delete $2 directory? (y/n)" RESP
+-  if [[ $RESP = "y" ]]; then
+-    rm -rf $2 2>/dev/null
+-  else
+-    echo_color red "ERROR:" -n
+-    echo "User cancelled rewriting of existing directory."
+-    exit 1
+-  fi
++  rm -rf $2 2>/dev/null
+ fi
+ mkdir $2 2>/dev/null
+ cp $1 $2 2>/dev/null
+@@ -145,7 +138,7 @@
+ #   1) Extrahovat do testdir (kontrola jmena a velikosti archivu, dekomprimace)
+ 
+ 
+-cd $2
++cd $2 || { echo_color REDCOLOR "ERROR (Cannot change directory to: $2)"; exit 1; }
+ touch $LOG
+ ARCHIVE=`basename $1`
+ NAME=`echo $ARCHIVE | cut -d . -f 1 | egrep "^x[a-z]{5}[0-9][0-9a-z]$"`
+@@ -213,7 +206,7 @@
+ 
+ #    6) Najdi prelozeny binarni soubor
+ echo -n "Searching for created binary file: "
+-EXE=`ls -F | grep "*" | tr -d "*" | grep "" -m 1`   # A najít binárku...
++EXE=`ls -F | grep "*" | tr -d "*" | grep "" -m 1`   # A najit binarku...
+ if [[ -f $EXE ]]; then
+   echo_color green "OK ($EXE)"
+ else
+@@ -322,6 +315,9 @@
+   let ERROR=ERROR+1
+ fi
+ 
++# Cat log file with verbose information to send them to the output of the test
++cat $LOG
++
+ echo -n "ALL CHECKS COMPLETED"
+ if [[ $ERROR -eq 0 ]]; then
+   echo_color green " WITHOUT ERRORS!"
+@@ -330,3 +326,6 @@
+ else
+   echo_color red " WITH $ERROR ERRORS!"
+ fi
++
++# Exit code needed for Github Actions to determine that the test was successful or not
++exit "$ERROR"
