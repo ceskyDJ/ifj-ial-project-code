@@ -76,7 +76,7 @@ Na cizí větve se nesahá, teda pokud se nedomluvíme, že někdo něco přeber
 Až budu mít něco, co chci prezentovat ostatním nebo i jen něco, co stojí za diskusi (či ji přímo vyžaduje), tak vytvořím pull request do `main`.
 Git sám při prvním push nové větve nabídne, jak nastavit remote a poté i vypíše link na vytvoření pull requestu.
 
-Pokud mám něco značně nedokončeného či mám jen zárodek a chci dát najevo, že se jedná o první nástřel/návrh, tak místo klasického PR vytvořím [draft pull requestu](https://github.blog/2019-02-14-introducing-draft-pull-requests/). Ten pak lze zplnohodnotnit na klasický PR.
+Pokud mám něco značně nedokončeného či mám jen zárodek a chci dát najevo, že se jedná o první nástřel/návrh, tak místo klasického PR vytvořím [draft pull request](https://github.blog/2019-02-14-introducing-draft-pull-requests/). Ten pak lze zplnohodnotnit na klasický PR.
 
 Na `main` se tedy nesahá jinak než přes pull requesty (jakmile se něco schválí, tak se udělá merge do `main` a je to).
 
