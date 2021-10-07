@@ -8,7 +8,6 @@
 
 BINARY_NAME=ifj21_compiler
 DOC_NAME=main
-OBJFILES=main.o
 
 CC=gcc
 CFLAGS=-std=c11 -g -pedantic -Wall -Wextra
@@ -23,8 +22,8 @@ all: build
 	$(CC) $(CFLAGS) -c $<
 
 # Link modules into final binary
-build: $(OBJFILES)
-	$(CC) $(CFLAGS) $(OBJFILES) -o ../bin/$(BINARY_NAME)
+build: *.o
+	$(CC) $(CFLAGS) *.o -o ../bin/$(BINARY_NAME)
 
 #######################################
 # Generate module dependencies
