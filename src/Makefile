@@ -36,43 +36,41 @@ dep:
 # Compile documentation (from its Git repository)
 doc:
 	git clone git@github.com:ceskyDJ/ifj-ial-project-docs.git
-	cd ifj-ial-project-docs
-	pdflatex $(DOC_NAME).tex
-	bibtex $(DOC_NAME).aux
-	pdflatex $(DOC_NAME).tex
-	pdflatex $(DOC_NAME).tex
-	mv $(DOC_NAME).pdf ../dokumentace.pdf
-	cd ..
+	cd ifj-ial-project-docs; pdflatex $(DOC_NAME).tex
+	cd ifj-ial-project-docs; bibtex $(DOC_NAME).aux
+	cd ifj-ial-project-docs; pdflatex $(DOC_NAME).tex
+	cd ifj-ial-project-docs; pdflatex $(DOC_NAME).tex
+	mv ifj-ial-project-docs/$(DOC_NAME).pdf ../tmp/dokumentace.pdf
 	rm -rf ifj-ial-project-docs
 
 # Create final archive
-archive: make_tmp doc copy_src copy_special convert_paths
-	tar -czf ../xsmahe01.tar.gz *
-	cd ..
-	rm -rf tmp
+archive: make_tmp doc copy_src copy_special copy_makefile
+	cd ../tmp; tar -czf ../xsmahe01.tar.gz *
+	rm -rf ../tmp
 
 # Copy source files into tmp folder (for creating archive)
 copy_src:
-	cp -r ../src/*.c ../src/*.h .
+	cp -r *.c *.h ../tmp/
 
 # Copy special files (required by assignment) into tmp folder
+# File `rozsireni` hasn't to exists, so `cd` should end with exit code 1 in this case.
+# To solve this problem there is || true (in case of `cd` error generate exit code 0)
 copy_special:
-	cp ../rozdeleni ../rozsireni . || true
+	cp ../rozdeleni ../rozsireni ../tmp/ || true
 
-# Convert development paths to production ones (rewrite Makefile for use in production)
-convert_paths:
-	sed -i 's/..\/bin/./' Makefile
+# Copy Makefile into tmp folder with path conversion (development paths to production ones)
+copy_makefile:
+	cp Makefile ../tmp/
+	sed -i 's/..\/bin/./' ../tmp/Makefile
 
 # Create tmp folder where the final project structure will be prepared
 make_tmp:
-	cd ..
-	mkdir tmp
-	cd tmp
+	mkdir ../tmp
 
 # Define virtual files and cleaning stuff
-.PHONY: clean doc all archive copy_src copy_special make_tmp build dep convert_paths
+.PHONY: clean doc all archive copy_src copy_special make_tmp build dep copy_makefile
 clean:
 	rm -f *.o *.c~ *.h~
 
 cleanall: clean
-	rm -f dep.list xsmahe01.tar.gz
+	rm -f dep.list ../xsmahe01.tar.gz
