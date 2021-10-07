@@ -34,10 +34,11 @@ dep:
 #######################################
 
 # Compile documentation (from its Git repository)
+# BibTeX may not be needed
 doc:
 	git clone git@github.com:ceskyDJ/ifj-ial-project-docs.git
-	cd ifj-ial-project-docs; pdflatex $(DOC_NAME).tex
-	cd ifj-ial-project-docs; bibtex $(DOC_NAME).aux
+	cd ifj-ial-project-docs; grep -q "\citation" $(DOC_NAME).tex && pdflatex $(DOC_NAME).tex || true
+	cd ifj-ial-project-docs; grep -q "\citation" $(DOC_NAME).tex && bibtex $(DOC_NAME).aux || true
 	cd ifj-ial-project-docs; pdflatex $(DOC_NAME).tex
 	cd ifj-ial-project-docs; pdflatex $(DOC_NAME).tex
 	mv ifj-ial-project-docs/$(DOC_NAME).pdf ../tmp/dokumentace.pdf
@@ -49,14 +50,16 @@ archive: make_tmp doc copy_src copy_special copy_makefile
 	rm -rf ../tmp
 
 # Copy source files into tmp folder (for creating archive)
+# *.h files could missing
 copy_src:
-	cp -r *.c *.h ../tmp/
+	cp -r *.c ../tmp/
+	ls *.h >/dev/null 2>&1 && cp -r *.h ../tmp/ || true
 
 # Copy special files (required by assignment) into tmp folder
-# File `rozsireni` hasn't to exists, so `cd` should end with exit code 1 in this case.
-# To solve this problem there is || true (in case of `cd` error generate exit code 0)
+# `rozsireni` could missing
 copy_special:
-	cp ../rozdeleni ../rozsireni ../tmp/ || true
+	cp ../rozdeleni ../tmp/
+	[[ -f ../rozsireni ]] && cp ../rozsireni ../tmp/ || true
 
 # Copy Makefile into tmp folder with path conversion (development paths to production ones)
 copy_makefile:
