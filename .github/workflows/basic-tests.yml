@@ -21,3 +21,21 @@ jobs:
 
       - name: Run test script
         run: ./test/basics/is_it_ok.sh xsmahe01 ./tmp
+
+  # Check rules from assignment not tested by the official script
+  other-assignment-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Run Make rule for creating final archive
+        run: cd src; make archive
+
+      - name: Create directory for testing purposes
+        run: mkdir tmp
+
+      - name: Extract the archive to the previously prepared directory
+        run: cd tmp; tar -xzvf xsmahe01.tar.gz
+
+      - name: Run own tests
+        run: ./test/basics/other-assignment-rules.sh
