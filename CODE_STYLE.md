@@ -38,8 +38,13 @@ Komentáře by měly následovat následující body:
 
 ### Hlavička souboru
 
-Každý soubor musí mít hlavičku ve následujícím formátu, autoři jsou uváděni
-podle toho, kdo na daném souboru skutečně pracoval:
+Každý soubor musí mít hlavičku ve formátu uvedném níže (podle typu souboru),
+autoři jsou uváděni podle toho, kdo na daném souboru skutečně pracoval.
+Aby se na hlavičky nezapomínalo (je to bodově penalizováno...), je jejich
+přítomnost automaticky testována. Kvůli tomu je třeba dodržet strukturu
+uvedenou níže, v opačném případě test neprojde.
+
+**Zdrojové a hlavičkové soubory jazyka C (`*.c` a `*.h`)**
 ```c
 /**
  * @file
@@ -50,6 +55,16 @@ podle toho, kdo na daném souboru skutečně pracoval:
  * 
  * @author Michal Šmahel (xsmahe01)
  */
+```
+
+**Makefile**
+```makefile
+# File description (short information about what is inside)
+#
+# IFJ and IAL project (IFJ21 compiler) 
+# Team: 128 (variant II)
+#
+# Author: Michal Šmahel (xsmahe01)
 ```
 
 ### Dokumentační komentáře
