@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: kentaro-m/auto-assign-action@v1.2.0
+        with:
+          repo-token: ${{ secrets.PROJECT_AUTOMATION_TOKEN }}
 
   # Copy properties from linked issue from pull request description
   # (if at least one issue is linked). Properties are labels
@@ -22,6 +24,7 @@ jobs:
         with:
           way: 'body'
           issues-close: false
+          token: ${{ secrets.PROJECT_AUTOMATION_TOKEN }}
 
   # Add pull request shortcut to project column
   # It automatically steps forward to next columns,
