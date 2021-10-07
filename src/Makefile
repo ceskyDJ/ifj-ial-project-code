@@ -46,7 +46,7 @@ doc:
 	rm -rf ifj-ial-project-docs
 
 # Create final archive
-archive: make_tmp doc copy_src copy_special
+archive: make_tmp doc copy_src copy_special convert_paths
 	tar -czf ../xsmahe01.tar.gz *
 	cd ..
 	rm -rf tmp
@@ -59,6 +59,10 @@ copy_src:
 copy_special:
 	cp ../rozdeleni ../rozsireni . || true
 
+# Convert development paths to production ones (rewrite Makefile for use in production)
+convert_paths:
+	sed -i 's/..\/bin/./' Makefile
+
 # Create tmp folder where the final project structure will be prepared
 make_tmp:
 	cd ..
@@ -66,7 +70,7 @@ make_tmp:
 	cd tmp
 
 # Define virtual files and cleaning stuff
-.PHONY: clean doc all archive copy_src copy_special make_tmp build dep
+.PHONY: clean doc all archive copy_src copy_special make_tmp build dep convert_paths
 clean:
 	rm -f *.o *.c~ *.h~
 
