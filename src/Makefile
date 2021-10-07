@@ -10,7 +10,7 @@ BINARY_NAME=ifj21_compiler
 DOC_NAME=main
 OBJFILES=main.o
 
-CC=gcc-7.5  # Merlin default gcc version
+CC=gcc
 CFLAGS=-std=c11 -g -pedantic -Wall -Wextra
 
 # `make` only compiles main binary
