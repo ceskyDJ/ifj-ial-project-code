@@ -2,11 +2,12 @@ name: 'Automation | Pull request'
 
 on:
   pull_request:
-    types: [opened, ready_for_review]
+    types: [opened, edited, ready_for_review]
 
 jobs:
   # Assign pull request to its author and choose and set reviewer
   auto-assign-author-and-reviewer:
+    if: ${{ github.event.action == 'opened' || github.event.action == 'ready_for_review' }}
     runs-on: ubuntu-latest
     steps:
       - uses: kentaro-m/auto-assign-action@v1.2.0
@@ -17,10 +18,10 @@ jobs:
   # (if at least one issue is linked). Properties are labels
   # and milestones
   copy-properties-from-issue:
-    if: ${{ github.event.action == 'opened' }}
+    if: ${{ github.event.action == 'opened' || github.event.action == 'edited' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: ceskyDJ/pr-set-issue-properties@v1.2.2
+      - uses: ceskyDJ/pr-set-issue-properties@v1.2.3
         with:
           way: 'body'
           issues-close: false
