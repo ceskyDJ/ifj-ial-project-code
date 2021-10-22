@@ -1,5 +1,5 @@
---- is_it_ok.sh	2021-10-05 00:50:19.664769278 +0200
-+++ is_it_ok.edited.sh	2021-10-05 01:20:00.798025727 +0200
+--- is_it_ok.sh	2021-10-22 02:42:59.791535216 +0200
++++ is_it_ok.edited.sh	2021-10-22 02:40:44.910491041 +0200
 @@ -121,14 +121,7 @@
  
  #   0) Priprava testdir a overeni serveru
@@ -34,7 +34,7 @@
  if [[ -f $EXE ]]; then
    echo_color green "OK ($EXE)"
  else
-@@ -322,6 +315,9 @@
+@@ -322,11 +315,23 @@
    let ERROR=ERROR+1
  fi
  
@@ -44,10 +44,18 @@
  echo -n "ALL CHECKS COMPLETED"
  if [[ $ERROR -eq 0 ]]; then
    echo_color green " WITHOUT ERRORS!"
-@@ -330,3 +326,6 @@
++
++  # Everything is OK
++  exit 0
+ elif [[ $ERROR -eq 1 ]]; then
+-  echo_color red " WITH $ERROR ERROR!"    
++  echo_color red " WITH $ERROR ERROR!"
++
++  # Some error occurred
++  exit 1
  else
    echo_color red " WITH $ERROR ERRORS!"
- fi
 +
-+# Exit code needed for Github Actions to determine that the test was successful or not
-+exit "$ERROR"
++  # More errors occurred
++  exit 1
+ fi
