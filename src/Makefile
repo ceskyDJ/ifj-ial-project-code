@@ -59,7 +59,7 @@ copy_src:
 # `rozsireni` could missing
 copy_special:
 	cp ../rozdeleni ../tmp/
-	[[ -f ../rozsireni ]] && cp ../rozsireni ../tmp/ || true
+	[ -f ../rozsireni ] && cp ../rozsireni ../tmp/ || true
 
 # Copy Makefile into tmp folder with path conversion (development paths to production ones)
 copy_makefile:

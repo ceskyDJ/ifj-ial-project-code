@@ -2,6 +2,8 @@
 
 cd tmp || { echo "Cannot move to directory: ./tmp" >&2; exit 1; }
 
+total_errors=0
+
 function echo_result() {
   # Usage:
   # - $1: Test number
@@ -13,6 +15,9 @@ function echo_result() {
   else
     result="Failed"
     color="\e[31m"
+
+    # Error counter
+    total_errors=$(( total_errors + 1 ))
   fi
 
   echo -e "${color}[${1}] $2 | ${result}\e[0m"
@@ -91,3 +96,5 @@ for file in *; do
 done
 [[ $error -eq 0 ]]; echo_result 4 "Files without required header. See CODE_STYLE.md for more info"
 [[ ! $error -eq 0 ]] && echo -e "\tFound files without header (or with bad header, check CODE_STYLE.md): ${files_without_header[*]}"
+
+exit "$total_errors"
