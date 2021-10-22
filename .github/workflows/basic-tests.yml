@@ -7,6 +7,9 @@ jobs:
   # We use it regularly for checking if the project meets all requirements
   official-test-script:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v2
 
@@ -34,6 +37,9 @@ jobs:
   # Check rules from assignment not tested by the official script
   other-assignment-rules:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v2
 
