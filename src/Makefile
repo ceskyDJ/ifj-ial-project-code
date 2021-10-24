@@ -9,6 +9,11 @@
 BINARY_NAME=ifj21_compiler
 DOC_NAME=main
 
+BIN_P=../build/bin
+DEP_P=../build/deps
+OBJ_P=../build/objs
+RES_P=../build/results
+
 CC=gcc
 CFLAGS=-std=c11 -g -pedantic -Wall -Wextra
 
@@ -23,14 +28,14 @@ all: build
 
 # Link modules into final binary
 build: *.o
-	$(CC) $(CFLAGS) *.o -o ../bin/$(BINARY_NAME)
+	$(CC) $(CFLAGS) *.o -o $(BIN_P)/$(BINARY_NAME)
 
 #######################################
 # Generate module dependencies
 dep:
-	$(CC) -MM *.c >dep.list
+	$(CC) -MM *.c >$(DEP_P)/dep.list
 
--include dep.list
+-include $(DEP_P)/dep.list
 #######################################
 
 # Compile documentation (from its Git repository)
