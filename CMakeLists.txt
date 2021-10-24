@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
 project(IFJ\ &\ IAL\ project\ \(code\) C)
 set(CMAKE_SOURCE_DIR src/)
-set(PROJECT_BINARY_DIR ../bin/)
-set(CMAKE_BINARY_DIR ../bin/)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../bin/)
+set(PROJECT_BINARY_DIR ../build/bin/)
+set(CMAKE_BINARY_DIR ../build/bin/)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../build/bin/)
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_COMPILER gcc)
