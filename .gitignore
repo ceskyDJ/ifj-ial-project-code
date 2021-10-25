@@ -4,6 +4,7 @@ src/dep.list
 
 # Help files
 *.o
+*.gch
 *.zip
 *.tar.gz
 
