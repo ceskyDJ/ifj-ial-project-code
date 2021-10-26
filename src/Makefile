@@ -72,17 +72,19 @@ dep:
 #########################################################TESTS##########################################################
 # Prepare and run tests
 test: $(TEST_OUTPUTS)
-	@echo -e '--------------------------'
-	@echo -e '          IGNORE          '
-	@echo -e '--------------------------'
-	@echo "$(IGNORED_TESTS)\n"
-	@echo -e '--------------------------'
-	@echo -e '          PASSED          '
-	@echo -e '--------------------------'
-	@echo "$(PASSED_TESTS)\n"
-	@echo -e '--------------------------'
-	@echo -e '          FAILED          '
-	@echo -e '--------------------------'
+	@echo '--------------------------'
+	@echo '          IGNORE          '
+	@echo '--------------------------'
+	@echo "$(IGNORED_TESTS)"
+	@echo ''
+	@echo '--------------------------'
+	@echo '          PASSED          '
+	@echo '--------------------------'
+	@echo "$(PASSED_TESTS)"
+	@echo ''
+	@echo '--------------------------'
+	@echo '          FAILED          '
+	@echo '--------------------------'
 	@echo "$(FAILED_TESTS)"
 
 # Generate test results
@@ -118,7 +120,7 @@ $(OBJ_P)/unity_memory.o: $(UNITY_P)/extras/unity_memory.c $(UNITY_P)/extras/unit
 .PRECIOUS: $(OBJ_P)/%_runner.o
 .PRECIOUS: $(OBJ_P)/test_%.o
 .PRECIOUS: $(BIN_P)/test_%
-.PRECIOUS: $(RES_P)test_%.txt
+.PRECIOUS: $(RES_P)/test_%.txt
 ########################################################################################################################
 
 # Compile documentation (from its Git repository)
