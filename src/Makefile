@@ -50,7 +50,7 @@ TEST_FILES=$(wildcard $(TEST_P)/*.c)
 TEST_OUTPUTS=$(patsubst $(TEST_P)/%.c, $(RES_P)/%.txt, $(TEST_FILES))
 
 # Define virtual files
-.PHONY: all build test archive dep clean cleanall
+.PHONY: all build test archive clean cleanall
 
 # `make` only compiles main binary
 all: build
@@ -61,13 +61,13 @@ $(OBJ_P)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Link modules into final binary
-build: $(MODULES)
-	$(CC) $(CFLAGS) $^ -o $(BIN_P)/$(BINARY_NAME)
+build: $(DEP_P)/dep.list $(MODULES)
+	$(CC) $(CFLAGS) $(MODULES) -o $(BIN_P)/$(BINARY_NAME)
 
 #######################################
 # Generate module dependencies
-dep:
-	$(CC) -MM *.c >$(DEP_P)/dep.list
+$(DEP_P)/dep.list: $(SRC_FILES)
+	$(CC) -MM *.c >$@
 
 -include $(DEP_P)/dep.list
 #######################################
