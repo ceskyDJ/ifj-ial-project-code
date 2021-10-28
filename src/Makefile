@@ -8,7 +8,7 @@
 # Help: https://devhints.io/makefile
 # Inspired by: https://www.throwtheswitch.org/build/make
 
-# Used variables:
+# Used magic variables:
 # $< ... first dependency
 # $^ ... all dependencies
 # $@ ... target
@@ -49,6 +49,9 @@ TEST_FILES=$(wildcard $(TEST_P)/*.c)
 # Transform the list of unit tests' source files into a list of test output files (similar to MODULES)
 TEST_OUTPUTS=$(patsubst $(TEST_P)/%.c, $(RES_P)/%.txt, $(TEST_FILES))
 
+# Define virtual files
+.PHONY: all build test archive dep clean cleanall
+
 # `make` only compiles main binary
 all: build
 
@@ -69,7 +72,6 @@ dep:
 -include $(DEP_P)/dep.list
 #######################################
 
-#########################################################TESTS##########################################################
 # Prepare and run tests
 test: $(TEST_OUTPUTS)
 	@echo '--------------------------'
@@ -121,49 +123,13 @@ $(OBJ_P)/unity_memory.o: $(UNITY_P)/extras/unity_memory.c $(UNITY_P)/extras/unit
 .PRECIOUS: $(OBJ_P)/test_%.o
 .PRECIOUS: $(BIN_P)/test_%
 .PRECIOUS: $(RES_P)/test_%.txt
-########################################################################################################################
-
-# Compile documentation (from its Git repository)
-# BibTeX may not be needed
-doc:
-	git clone git@github.com:ceskyDJ/ifj-ial-project-docs.git
-	cd ifj-ial-project-docs; grep -q "\citation" $(DOC_NAME).tex && pdflatex $(DOC_NAME).tex || true
-	cd ifj-ial-project-docs; grep -q "\citation" $(DOC_NAME).tex && bibtex $(DOC_NAME).aux || true
-	cd ifj-ial-project-docs; pdflatex $(DOC_NAME).tex
-	cd ifj-ial-project-docs; pdflatex $(DOC_NAME).tex
-	mv ifj-ial-project-docs/$(DOC_NAME).pdf ../tmp/dokumentace.pdf
-	rm -rf ifj-ial-project-docs
 
 # Create final archive
-archive: make_tmp doc copy_src copy_special copy_makefile
-	cd ../tmp; tar -czf ../xsmahe01.tar.gz *
-	rm -rf ../tmp
+archive:
+	../create-archive.sh $(DOC_NAME)
 
-# Copy source files into tmp folder (for creating archive)
-# *.h files could missing
-copy_src:
-	cp -r *.c ../tmp/
-	ls *.h >/dev/null 2>&1 && cp -r *.h ../tmp/ || true
-
-# Copy special files (required by assignment) into tmp folder
-# `rozsireni` could missing
-copy_special:
-	cp ../rozdeleni ../tmp/
-	[ -f ../rozsireni ] && cp ../rozsireni ../tmp/ || true
-
-# Copy Makefile into tmp folder with path conversion (development paths to production ones)
-copy_makefile:
-	cp Makefile ../tmp/
-	sed -i 's/..\/bin/./' ../tmp/Makefile
-
-# Create tmp folder where the final project structure will be prepared
-make_tmp:
-	mkdir ../tmp
-
-# Define virtual files and cleaning stuff
-.PHONY: clean doc all archive copy_src copy_special make_tmp build dep copy_makefile test
+# Cleaning stuff
 clean:
-	rm -f *.o *.c~ *.h~
-
+	rm -f *.c~ *.h~
 cleanall: clean
 	rm -f $(BIN_P)/* $(DEP_P)/* $(OBJ_P)/* $(RES_P)/* $(RUN_P)/* ../xsmahe01.tar.gz
