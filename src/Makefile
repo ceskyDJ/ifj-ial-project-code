@@ -72,12 +72,12 @@ dep:
 #########################################################TESTS##########################################################
 # Prepare and run tests
 test: $(TEST_OUTPUTS)
-	@echo "-----------------------\nIGNORES:\n-----------------------"
+	@echo -e "----------------------\n\tIGNORE\n----------------------"
 	@echo "$(IGNORED_TESTS)"
-	@echo "-----------------------\nFAILURES:\n-----------------------"
-	@echo "$(FAILED_TESTS)"
-	@echo "-----------------------\nPASSED:\n-----------------------"
+	@echo -e "----------------------\n\tPASSED\n----------------------"
 	@echo "$(PASSED_TESTS)"
+	@echo -e "----------------------\n\tFAILED\n----------------------"
+	@echo "$(FAILED_TESTS)"
 
 # Generate test results
 $(RES_P)/test_%.txt: $(BIN_P)/test_%
