@@ -1,6 +1,17 @@
---- Makefile.std	2021-10-28 22:00:47.141725766 +0200
-+++ Makefile	2021-10-28 22:00:18.437936067 +0200
-@@ -14,25 +14,13 @@
+--- Makefile.std	2021-10-28 23:16:48.072749080 +0200
++++ Makefile	2021-10-28 23:17:26.536475535 +0200
+@@ -10,36 +10,20 @@
+ 
+ # Usage:
+ # make          ... build main binary
+-# make test     ... build and run unit tests
+-# make archive  ... create final archive
+ # make clean    ... remove temporary files
+-# make cleanall ... remove all generated temp files
+ 
+ # Used magic variables:
+ # $< ... first dependency
+-# $^ ... all dependencies
  # $@ ... target
  
  BINARY_NAME=ifj21_compiler
@@ -29,7 +40,7 @@
  
  # Compiler configs
  CC=gcc
-@@ -44,13 +32,9 @@
+@@ -51,13 +35,9 @@
  # It's done by substitution - every *.c file creates one object one (*.o),
  # so we can just change extension and path and we're done
  MODULES=$(patsubst $(SRC_P)/%.c, $(OBJ_P)/%.o, $(SRC_FILES))
@@ -43,8 +54,8 @@
 +.PHONY: all clean
  
  # `make` only compiles main binary
- all: build
-@@ -72,64 +56,6 @@
+ all: $(BIN_P)/$(BINARY_NAME)
+@@ -79,64 +59,6 @@
  -include $(DEP_P)/dep.list
  #######################################
  

@@ -8,6 +8,13 @@
 # Help: https://devhints.io/makefile
 # Inspired by: https://www.throwtheswitch.org/build/make
 
+# Usage:
+# make          ... build main binary
+# make test     ... build and run unit tests
+# make archive  ... create final archive
+# make clean    ... remove temporary files
+# make cleanall ... remove all generated temp files
+
 # Used magic variables:
 # $< ... first dependency
 # $^ ... all dependencies
