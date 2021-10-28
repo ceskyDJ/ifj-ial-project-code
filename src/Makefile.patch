@@ -39,8 +39,8 @@
 -TEST_OUTPUTS=$(patsubst $(TEST_P)/%.c, $(RES_P)/%.txt, $(TEST_FILES))
  
  # Define virtual files
--.PHONY: all build test archive clean cleanall
-+.PHONY: all build clean
+-.PHONY: all test archive clean cleanall
++.PHONY: all clean
  
  # `make` only compiles main binary
  all: build
