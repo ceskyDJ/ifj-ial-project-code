@@ -6,7 +6,8 @@
       <file path="$PROJECT_DIR$/src" />
     </sourceRoots>
     <excludeRoots>
-      <file path="$PROJECT_DIR$/bin" />
+      <file path="$PROJECT_DIR$/build" />
+      <file path="$PROJECT_DIR$/unity" />
     </excludeRoots>
   </component>
 </project>
