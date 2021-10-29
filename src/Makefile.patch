@@ -1,0 +1,123 @@
+--- Makefile.std	2021-10-28 23:16:48.072749080 +0200
++++ Makefile	2021-10-28 23:17:26.536475535 +0200
+@@ -10,36 +10,20 @@
+ 
+ # Usage:
+ # make          ... build main binary
+-# make test     ... build and run unit tests
+-# make archive  ... create final archive
+ # make clean    ... remove temporary files
+-# make cleanall ... remove all generated temp files
+ 
+ # Used magic variables:
+ # $< ... first dependency
+-# $^ ... all dependencies
+ # $@ ... target
+ 
+ BINARY_NAME=ifj21_compiler
+-DOC_NAME=main
+ 
+ # Project sources
+ SRC_P=.
+-# Unit test sources
+-TEST_P=../test/unit
+ # Directories with build data
+-BIN_P=../build/bin
+-DEP_P=../build/deps
+-OBJ_P=../build/objs
+-RES_P=../build/results
+-RUN_P=../build/runners
+-# Unity test framework
+-UNITY_P=../unity
+-
+-# Test statistics
+-IGNORED_TESTS = `grep -qs IGNORE $(RES_P)/*.txt && grep -s IGNORE $(RES_P)/*.txt | sed -E 's|$(RES_P)/[a-zA-Z0-9_]+\.txt:../||g' || echo "There are no ignored tests"`
+-PASSED_TESTS = `grep -qs PASS $(RES_P)/*.txt && grep PASS $(RES_P)/*.txt | sed -E 's|$(RES_P)/[a-zA-Z_]+\.txt:../||g' || echo "There are no passed tests"`
+-FAILED_TESTS = `grep -qs FAIL[^E] $(RES_P)/*.txt && grep FAIL[^E] $(RES_P)/*.txt | sed -E 's|$(RES_P)/[a-zA-Z_]+\.txt:../||g' || echo "There are no failed tests"`
++BIN_P=.
++DEP_P=.
++OBJ_P=.
+ 
+ # Compiler configs
+ CC=gcc
+@@ -51,13 +35,9 @@
+ # It's done by substitution - every *.c file creates one object one (*.o),
+ # so we can just change extension and path and we're done
+ MODULES=$(patsubst $(SRC_P)/%.c, $(OBJ_P)/%.o, $(SRC_FILES))
+-# Get a list of all unit test source files (similar to SRC_FILES)
+-TEST_FILES=$(wildcard $(TEST_P)/*.c)
+-# Transform the list of unit tests' source files into a list of test output files (similar to MODULES)
+-TEST_OUTPUTS=$(patsubst $(TEST_P)/%.c, $(RES_P)/%.txt, $(TEST_FILES))
+ 
+ # Define virtual files
+-.PHONY: all test archive clean cleanall
++.PHONY: all clean
+ 
+ # `make` only compiles main binary
+ all: $(BIN_P)/$(BINARY_NAME)
+@@ -79,64 +59,6 @@
+ -include $(DEP_P)/dep.list
+ #######################################
+ 
+-# Prepare and run tests
+-test: $(TEST_OUTPUTS)
+-	@echo '--------------------------'
+-	@echo '          IGNORE          '
+-	@echo '--------------------------'
+-	@echo "$(IGNORED_TESTS)"
+-	@echo ''
+-	@echo '--------------------------'
+-	@echo '          PASSED          '
+-	@echo '--------------------------'
+-	@echo "$(PASSED_TESTS)"
+-	@echo ''
+-	@echo '--------------------------'
+-	@echo '          FAILED          '
+-	@echo '--------------------------'
+-	@echo "$(FAILED_TESTS)"
+-
+-# Generate test results
+-$(RES_P)/test_%.txt: $(BIN_P)/test_%
+-	-./$< >$@ 2>&1
+-
+-# Create tests' binaries
+-$(BIN_P)/test_%: $(OBJ_P)/unity.o $(OBJ_P)/unity_memory.o $(OBJ_P)/test_%_runner.o $(OBJ_P)/test_%.o $(OBJ_P)/%.o
+-	$(CC) $^ -o $@
+-
+-# Compile unit tests' modules
+-$(OBJ_P)/test_%.o: $(TEST_P)/test_%.c
+-	$(CC) $(CFLAGS) -c $< -o $@ -DTEST
+-
+-# Compile unit test runners' modules
+-$(OBJ_P)/%_runner.o: $(RUN_P)/%_runner.c
+-	$(CC) $(CFLAGS) -c $< -o $@ -DTEST
+-
+-# Generate unit test runners' source code
+-$(RUN_P)/%_runner.c: $(TEST_P)/%.c
+-	ruby $(UNITY_P)/auto/generate_test_runner.rb $< $@
+-
+-# Compile Unity framework's main module
+-$(OBJ_P)/unity.o: $(UNITY_P)/src/unity.c $(UNITY_P)/src/unity.h
+-	$(CC) $(CFLAGS) -c $< -o $@ -DUNITY_INCLUDE_CONFIG_H
+-
+-# Compile Unity framework's memory add-on module
+-$(OBJ_P)/unity_memory.o: $(UNITY_P)/extras/unity_memory.c $(UNITY_P)/extras/unity_memory.h
+-	$(CC) $(CFLAGS) -c $< -o $@
+-
+-# Don't delete results of explicit rules at the end of rule processing
+-.PRECIOUS: $(RUN_P)/%_runner.c
+-.PRECIOUS: $(OBJ_P)/%_runner.o
+-.PRECIOUS: $(OBJ_P)/test_%.o
+-.PRECIOUS: $(BIN_P)/test_%
+-.PRECIOUS: $(RES_P)/test_%.txt
+-
+-# Create final archive
+-archive:
+-	../create-archive.sh $(DOC_NAME)
+-
+ # Cleaning stuff
+ clean:
+-	rm -f *.c~ *.h~
+-cleanall: clean
+-	rm -f $(BIN_P)/* $(DEP_P)/* $(OBJ_P)/* $(RES_P)/* $(RUN_P)/* ../xsmahe01.tar.gz
++	rm -f *.o *.c~ *.h~ xsmahe01.tar.gz
