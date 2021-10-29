@@ -5,9 +5,11 @@
     <sourceRoots>
       <file path="$PROJECT_DIR$/src" />
     </sourceRoots>
+    <libraryRoots>
+      <file path="$PROJECT_DIR$/unity" />
+    </libraryRoots>
     <excludeRoots>
       <file path="$PROJECT_DIR$/build" />
-      <file path="$PROJECT_DIR$/unity" />
     </excludeRoots>
   </component>
 </project>
