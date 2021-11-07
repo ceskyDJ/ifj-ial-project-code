@@ -42,11 +42,11 @@ void kwtable_destroy(kwtable_t *table)
     symtable_destroy((symtable_t *)table);
 }
 
-keyword_t *kwtable_find(kwtable_t *table, char *id)
+char *kwtable_find(kwtable_t *table, char *id)
 {
     keyword_t *kw;
 
     kw = (keyword_t*) symtable_find(table, id);
 
-    return kw;
+    return kw ? kw->name : NULL;
 }

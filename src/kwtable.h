@@ -49,7 +49,7 @@ void kwtable_destroy(kwtable_t *table);
  * @return Pointer to the keyword that is the identifier or
  *          NULL if identifier is not a keyword.
  */
-keyword_t *kwtable_find(kwtable_t *table, char *id);
+char *kwtable_find(kwtable_t *table, char *id);
 
 #endif
 
