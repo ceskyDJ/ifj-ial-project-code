@@ -11,3 +11,5 @@ jobs:
 
       - name: Run Make rule for creating and running unit tests
         run: cd src; make test; ../test/unit/get-results.sh
+        env:
+          EXTRA_CFLAGS: -Werror
