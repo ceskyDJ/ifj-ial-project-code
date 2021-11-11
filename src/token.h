@@ -29,6 +29,8 @@ enum token_type {
     TYPE_SPEC, COMMA,
     // Other
     LEFT_PAR, RIGHT_PAR
+    // End of input, last token to be sent
+    END
 };
 
 typedef struct token {
