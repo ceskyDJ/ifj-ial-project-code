@@ -128,6 +128,71 @@ void test_string_cmp_str2_is_substring_of_str1()
     TEST_ASSERT_NOT_EQUAL_INT(0, ret);
 }
 
+void test_string_check_prefix_str1_is_prefix()
+{
+    int ret;
+    string_t *str1 = string_create();
+    string_t *str2 = string_create();
+    append_to_string(str1, "hell");
+    append_to_string(str2, "helloo");
+
+    ret = string_check_prefix(str1, str2);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+}
+
+void test_string_check_prefix_same_strings()
+{
+    int ret;
+    string_t *str1 = string_create();
+    string_t *str2 = string_create();
+    append_to_string(str1, "hell");
+    append_to_string(str2, "hell");
+
+    ret = string_check_prefix(str1, str2);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+}
+
+void test_string_check_prefix_str1_is_not_prefix()
+{
+    int ret;
+    string_t *str1 = string_create();
+    string_t *str2 = string_create();
+    append_to_string(str1, "hello");
+    append_to_string(str2, "hell");
+
+    ret = string_check_prefix(str1, str2);
+
+    TEST_ASSERT_NOT_EQUAL_INT(0, ret);
+}
+
+void test_string_check_prefix_str1_is_empty()
+{
+    int ret;
+    string_t *str1 = string_create();
+    string_t *str2 = string_create();
+    append_to_string(str1, "");
+    append_to_string(str2, "hell");
+
+    ret = string_check_prefix(str1, str2);
+
+    TEST_ASSERT_EQUAL_INT(0, ret);
+}
+
+void test_string_check_prefix_str2_is_empty()
+{
+    int ret;
+    string_t *str1 = string_create();
+    string_t *str2 = string_create();
+    append_to_string(str1, "hell");
+    append_to_string(str2, "");
+
+    ret = string_check_prefix(str1, str2);
+
+    TEST_ASSERT_NOT_EQUAL_INT(0, ret);
+}
+
 void test_string_export_empty_string()
 {
     char *export;
