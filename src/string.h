@@ -64,6 +64,18 @@ int string_appendc(string_t *str, char c);
 int string_cmp(string_t *str1, string_t *str2);
 
 /**
+ * Checks if first string is the prefix of the second string.
+ * Any string contains an empty prefix.
+ * @param str1 String that should be the prefix.
+ * @param str2 String that should containt str1 as prefix.
+ * @pre str1 != NULL
+ * @pre str2 != NULL
+ *
+ * @return 0 if str1 is indeed a prefix of str2, non-zero otherwise
+ */
+int string_check_prefix(string_t *str1, string_t *str2);
+
+/**
  * Creates `char *` without padding from the ADT string.
  *
  * @param str String from which to export.

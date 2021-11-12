@@ -72,6 +72,14 @@ int string_cmp(string_t *str1, string_t *str2)
     return strcmp(str1->content, str2->content);
 }
 
+int string_check_prefix(string_t *str1, string_t *str2)
+{
+    assert(str1);
+    assert(str2);
+
+    return strncmp(str1->content, str2->content, strlen(str1->content));
+}
+
 char *string_export(string_t *str)
 {
     assert(str);
