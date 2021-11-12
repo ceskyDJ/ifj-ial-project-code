@@ -15,6 +15,9 @@
 # make clean    ... remove temporary files
 # make cleanall ... remove all generated temp files
 
+# Used environment variables:
+# EXTRA_CFLAGS - additional flags for the C compiler
+
 # Used magic variables:
 # $< ... first dependency
 # $^ ... all dependencies
@@ -43,7 +46,7 @@ FAILED_TESTS = `grep -qs FAIL[^E] $(RES_P)/*.txt && grep FAIL[^E] $(RES_P)/*.txt
 
 # Compiler configs
 CC=gcc
-CFLAGS=-std=c11 -g -pedantic -Wall -Wextra
+CFLAGS=-std=c11 -g -pedantic -Wall -Wextra $$EXTRA_CFLAGS
 
 # Get a list of all source files (ex.: SRC_P/main.c SRC_P/symtable.c)
 SRC_FILES=$(wildcard $(SRC_P)/*.c)

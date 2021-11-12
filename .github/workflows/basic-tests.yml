@@ -63,3 +63,5 @@ jobs:
 
       - name: Run own tests
         run: ./test/basics/other-assignment-rules.sh
+        env:
+          EXTRA_CFLAGS: -Werror
