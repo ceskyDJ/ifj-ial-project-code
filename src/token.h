@@ -28,7 +28,7 @@ enum token_type {
     // Special operators
     TYPE_SPEC, COMMA,
     // Other
-    LEFT_PAR, RIGHT_PAR
+    LEFT_PAR, RIGHT_PAR,
     // End of input, last token to be sent
     END
 };
