@@ -13,6 +13,7 @@
 #define _TOKEN_H_
 
 #include "symtable.h"
+#include "kwtable.h"
 
 enum token_type {
     // Symbols
