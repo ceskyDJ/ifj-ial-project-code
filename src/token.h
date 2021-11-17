@@ -12,6 +12,8 @@
 #ifndef _TOKEN_H_
 #define _TOKEN_H_
 
+#include "symtable.h"
+
 enum token_type {
     // Symbols
     IDENTIFIER, KEYWORD,
