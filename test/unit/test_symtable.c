@@ -117,7 +117,7 @@ void test_check_retrieved_variable_identifier_properties()
     id->line = line;
     id->character = character;
     id->type = VARIABLE;
-    id->var.type = STRING;
+    id->var.type = VAR_STRING;
     id->var.init = init;
     id->var.used = used;
     identifier_t *check = symtable_find(t, "foo");
@@ -125,7 +125,7 @@ void test_check_retrieved_variable_identifier_properties()
     TEST_ASSERT_EQUAL_INT(check->line, line);
     TEST_ASSERT_EQUAL_INT(check->character, character);
     TEST_ASSERT_EQUAL_INT(check->type, VARIABLE);
-    TEST_ASSERT_EQUAL_INT(check->var.type, STRING);
+    TEST_ASSERT_EQUAL_INT(check->var.type, VAR_STRING);
     TEST_ASSERT_EQUAL_INT(check->var.init, init);
     TEST_ASSERT_EQUAL_INT(check->var.used, used);
 }
