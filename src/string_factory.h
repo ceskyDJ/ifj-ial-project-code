@@ -90,6 +90,18 @@ int string_check_prefix(string_t *str1, string_t *str2);
  */
 char *string_export(string_t *str);
 
+/**
+ * Exposes the content of ADT string for uses that do not need
+ * allocated memory to work with.
+ *
+ * @param str String which to expose the content of.
+ *
+ * @pre str != NULL
+ *
+ * @return `char *` of the string content
+ */
+char *string_expose(string_t *str);
+
 struct string {
     size_t len;
     size_t max_len;

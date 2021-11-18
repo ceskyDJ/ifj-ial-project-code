@@ -94,3 +94,10 @@ char *string_export(string_t *str)
     return export;
 }
 
+char *string_expose(string_t *str)
+{
+    assert(str);
+
+    return str->content;
+}
+

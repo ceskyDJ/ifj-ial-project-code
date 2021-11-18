@@ -218,3 +218,16 @@ void test_string_export_not_empty_string()
     TEST_ASSERT_EQUAL_STRING(export, "hello");
 }
 
+void test_string_expose()
+{
+    char *exposed;
+    string_t *str = string_create();
+    append_to_string(str, "hello");
+
+    exposed = string_expose(str);
+
+    TEST_ASSERT_NOT_NULL(exposed);
+    TEST_ASSERT_EQUAL_INT(strlen("hello"), strlen(exposed));
+    TEST_ASSERT_EQUAL_STRING(exposed, "hello");
+}
+
