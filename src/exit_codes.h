@@ -1,5 +1,5 @@
 /**
- * @file errno.h
+ * @file exit_codes.h
  * IFJ21 compiler error numbers.
  *
  * IFJ and IAL project (IFJ21 compiler)

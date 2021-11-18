@@ -7,6 +7,7 @@
  * IFJ and IAL project (IFJ21 compiler)
  * Team: 128 (variant II)
  *
+ * @author David Rodrigues (dmcrodrigues) original author
  * @author Martin Havlík (xhavli56)
  *
  * Copyright (c) 2012 David Rodrigues
