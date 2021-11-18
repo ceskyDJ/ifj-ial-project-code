@@ -1,5 +1,5 @@
 /**
- * @file string_t.c
+ * @file string_factory.c
  * String_t operations implementation.
  *
  * IFJ and IAL project (IFJ21 compiler)
@@ -8,7 +8,7 @@
  * @author Martin Havlík (xhavli56)
  */
 
-#include "string.h"
+#include "string_factory.h"
 
 #include <errno.h>
 #include <string.h>

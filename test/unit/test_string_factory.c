@@ -1,5 +1,5 @@
 #include "../../unity/src/unity.h"
-#include "../../src/string.h"
+#include "../../src/string_factory.h"
 
 #include <string.h>
 

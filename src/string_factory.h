@@ -1,5 +1,5 @@
 /**
- * @file string_t.h
+ * @file string_factory.h
  * String_t abstract data type.
  *
  * IFJ and IAL project (IFJ21 compiler)
