@@ -23,8 +23,6 @@ typedef struct string string_t;
 /**
  * Creates a new empty string.
  *
- * @param max Initial maximal length.
- *
  * @return  Pointer to newly created string ADT or
  *          NULL on creation failure.
  */
@@ -34,6 +32,7 @@ string_t *string_create(void);
  * Destroys a string.
  *
  * @param str String to destroy.
+ *
  * @pre str != NULL
  */
 void string_destroy(string_t *str);
@@ -43,6 +42,7 @@ void string_destroy(string_t *str);
  *
  * @param str String to which to append to.
  * @param c Character to append.
+ *
  * @pre str != NULL
  *
  * @return 0 on successful append, negative value otherwise.
@@ -54,6 +54,7 @@ int string_appendc(string_t *str, char c);
  *
  * @param str1 First string to compare.
  * @param str2 Second string to compare.
+ *
  * @pre str1 != NULL
  * @pre str1->content != NULL
  * @pre str2 != NULL
@@ -66,8 +67,10 @@ int string_cmp(string_t *str1, string_t *str2);
 /**
  * Checks if first string is the prefix of the second string.
  * Any string contains an empty prefix.
+ *
  * @param str1 String that should be the prefix.
  * @param str2 String that should containt str1 as prefix.
+ *
  * @pre str1 != NULL
  * @pre str2 != NULL
  *
@@ -76,9 +79,11 @@ int string_cmp(string_t *str1, string_t *str2);
 int string_check_prefix(string_t *str1, string_t *str2);
 
 /**
- * Creates `char *` without padding from the ADT string.
+ * Allocates and fills memory with the content of ADT string
+ * without any padding. Returned `char *` needs to be freed!
  *
  * @param str String from which to export.
+ *
  * @pre str != NULL
  *
  * @return `char *` containing the string without any padding.
