@@ -17,7 +17,7 @@
 #define SYMTABLE_BUCKETS 23
 
 enum variable_type {
-    INTEGER='i', NUMBER='n', STRING='s'
+    VAR_INTEGER='i', VAR_NUMBER='n', VAR_STRING='s'
 };
 enum identifier_type {
     VARIABLE=1, FUNCTION

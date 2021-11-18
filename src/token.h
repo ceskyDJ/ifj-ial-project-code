@@ -12,6 +12,8 @@
 #ifndef _TOKEN_H_
 #define _TOKEN_H_
 
+#include "symtable.h"
+
 enum token_type {
     // Symbols
     IDENTIFIER, KEYWORD,
@@ -28,7 +30,7 @@ enum token_type {
     // Special operators
     TYPE_SPEC, COMMA,
     // Other
-    LEFT_PAR, RIGHT_PAR
+    LEFT_PAR, RIGHT_PAR,
     // End of input, last token to be sent
     END
 };
