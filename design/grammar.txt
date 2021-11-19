@@ -1,0 +1,94 @@
+Testing and developing here: https://www.cs.princeton.edu/courses/archive/spring20/cos320/LL1/
+
+Dictionary:
+    SEQ ... sequence
+    E/e .. expression
+    RET ... return
+    FUN ... function
+    '' ... epsilon
+    DEC ... declaration
+    DEF ... definition
+    id ... identifier
+    STMT ... statement
+
+starting non-terminal: PROG
+--- paste what is below to the simulator ---
+
+PROG ::= CODE
+
+CODE ::= CODE' CODE''
+CODE ::= ''
+CODE' ::= FUN_DEC
+CODE' ::= FUN_DEF
+CODE' ::= CALL
+CODE'' ::= CODE' CODE''
+CODE'' ::= ''
+
+FUN_DEC ::= global id : FUN_SIGNATURE
+FUN_SIGNATURE ::= function ( TYPE_LIST ) FUN_RET
+TYPE_LIST::= TYPE TYPE_LIST'
+TYPE_LIST::= ''
+TYPE_LIST' ::= , TYPE TYPE_LIST'
+TYPE_LIST' ::= ''
+FUN_RET ::= : FUN_RET_LIST
+FUN_RET ::= ''
+
+CALL ::= id ( TERM_SEQ )
+
+TERM_SEQ ::= TERM TERM_SEQ'
+TERM_SEQ ::= ''
+TERM_SEQ' ::= , TERM TERM_SEQ'
+TERM_SEQ' ::= ''
+
+FUN_RET_LIST ::= TYPE FUN_RET_LIST'
+FUN_RET_LIST' ::= , TYPE FUN_RET_LIST'
+FUN_RET_LIST' ::= ''
+
+RET_STMT ::= return RET_E_LIST
+RET_E_LIST ::= E_LIST
+RET_E_LIST ::= ''
+
+FUN_DEF ::= function id ( PARAM_LIST ) FUN_RET BODY end
+PARAM_LIST ::= PARAM PARAM'
+PARAM_LIST ::= ''
+PARAM ::= id : TYPE
+PARAM' ::= , PARAM PARAM'
+PARAM' ::= ''
+
+BODY ::= BODY' BODY''
+BODY ::= ''
+BODY' ::= VAR_DEC_DEF
+BODY' ::= STMT
+BODY' ::= IF
+BODY' ::= WHILE
+BODY' ::= RET_STMT
+BODY'' ::= BODY' BODY''
+BODY'' ::= ''
+
+TERM ::= id
+TERM ::= integer
+TERM ::= number
+TERM ::= string
+TERM ::= nil
+
+VAR_DEC_DEF ::= VAR_DEC VAR_ASSIGN
+VAR_DEC ::= local id : TYPE
+TYPE ::= integer
+TYPE ::= number
+TYPE ::= string
+VAR_ASSIGN ::= = e
+VAR_ASSIGN ::= ''
+
+STMT ::= ID_SEQ = E_LIST
+ID_SEQ ::= id ID_SEQ'
+ID_SEQ' ::= , id ID_SEQ'
+ID_SEQ' ::= ''
+
+E_LIST ::= e E'
+E' ::= , e E'
+E' ::= ''
+
+IF ::= if e then BODY else BODY end
+
+WHILE ::= while e do BODY end
+
