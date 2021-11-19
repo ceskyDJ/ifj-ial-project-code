@@ -53,7 +53,7 @@ int string_appendc(string_t *str, char c)
         }
         str->max_len = 2*str->max_len;
 
-        strncpy(grown, str->content, str->len);
+        memcpy(grown, str->content, str->len);
 
         free(str->content);
         str->content = grown;
