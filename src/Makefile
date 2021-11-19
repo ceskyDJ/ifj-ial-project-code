@@ -46,6 +46,7 @@ FAILED_TESTS = `grep -qs FAIL[^E] $(RES_P)/*.txt && grep FAIL[^E] $(RES_P)/*.txt
 
 # Compiler configs
 CC=gcc
+LINKER=ld
 CFLAGS=-std=c11 -g -pedantic -Wall -Wextra $$EXTRA_CFLAGS
 
 # Get a list of all source files (ex.: SRC_P/main.c SRC_P/symtable.c)
@@ -71,15 +72,19 @@ $(OBJ_P)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Link modules into final binary
-$(BIN_P)/$(BINARY_NAME): $(DEP_P)/dep.list $(MODULES)
+$(BIN_P)/$(BINARY_NAME): $(DEP_P)/dep-src.list $(MODULES)
 	$(CC) $(CFLAGS) $(MODULES) -o $@
 
 #######################################
 # Generate module dependencies
-$(DEP_P)/dep.list: $(SRC_FILES)
+$(DEP_P)/dep-src.list: $(SRC_FILES)
 	$(CC) -MM *.c >$@
 
--include $(DEP_P)/dep.list
+$(DEP_P)/dep-test.list: $(TEST_FILES)
+	../test/unit/get-dependency-list.sh $(TEST_P) $(OBJ_P) >$@
+
+-include $(DEP_P)/dep-src.list
+-include $(DEP_P)/dep-test.list
 #######################################
 
 # Prepare and run tests
@@ -100,12 +105,16 @@ test: $(TEST_OUTPUTS)
 	@echo "$(FAILED_TESTS)"
 
 # Generate test results
-$(RES_P)/test_%.txt: $(BIN_P)/test_%
+$(RES_P)/test_%.txt: $(BIN_P)/test_% $(DEP_P)/dep-test.list
 	-./$< >$@ 2>&1
 
-# Create tests' binaries
-$(BIN_P)/test_%: $(OBJ_P)/unity.o $(OBJ_P)/unity_memory.o $(OBJ_P)/test_%_runner.o $(OBJ_P)/test_%.o $(OBJ_P)/%.o
+# Create tests' binaries (link prepared obj files together and append C std lib)
+$(BIN_P)/test_%: $(OBJ_P)/unity.o $(OBJ_P)/unity_memory.o $(OBJ_P)/test_%_runner.o $(OBJ_P)/test_%_final.o
 	$(CC) $^ -o $@
+
+# Linking unit tests' modules' objects with their dependencies
+$(OBJ_P)/test_%_final.o: $(OBJ_P)/test_%.o
+	$(LINKER) -r -o $@ $(shell ../test/unit/get-dependency-list.sh $(TEST_P) $(OBJ_P) $@)
 
 # Compile unit tests' modules
 $(OBJ_P)/test_%.o: $(TEST_P)/test_%.c

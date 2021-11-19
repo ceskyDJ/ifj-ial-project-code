@@ -1,6 +1,6 @@
---- Makefile.std	2021-11-11 22:55:29.911188353 +0100
-+++ Makefile	2021-11-11 22:59:06.613477326 +0100
-@@ -10,43 +10,24 @@
+--- Makefile.std	2021-11-19 15:59:00.948144130 +0100
++++ Makefile	2021-11-19 16:06:57.481855321 +0100
+@@ -10,44 +10,24 @@
  
  # Usage:
  # make          ... build main binary
@@ -43,12 +43,13 @@
  
  # Compiler configs
  CC=gcc
+-LINKER=ld
 -CFLAGS=-std=c11 -g -pedantic -Wall -Wextra $$EXTRA_CFLAGS
 +CFLAGS=-std=c11 -g -pedantic -Wall -Wextra
  
  # Get a list of all source files (ex.: SRC_P/main.c SRC_P/symtable.c)
  SRC_FILES=$(wildcard $(SRC_P)/*.c)
-@@ -54,13 +35,9 @@
+@@ -55,13 +35,9 @@
  # It's done by substitution - every *.c file creates one object one (*.o),
  # so we can just change extension and path and we're done
  MODULES=$(patsubst $(SRC_P)/%.c, $(OBJ_P)/%.o, $(SRC_FILES))
@@ -63,8 +64,15 @@
  
  # `make` only compiles main binary
  all: $(BIN_P)/$(BINARY_NAME)
-@@ -82,64 +59,6 @@
- -include $(DEP_P)/dep.list
+@@ -80,75 +56,9 @@
+ $(DEP_P)/dep-src.list: $(SRC_FILES)
+ 	$(CC) -MM *.c >$@
+ 
+-$(DEP_P)/dep-test.list: $(TEST_FILES)
+-	../test/unit/get-dependency-list.sh $(TEST_P) $(OBJ_P) >$@
+-
+ -include $(DEP_P)/dep-src.list
+--include $(DEP_P)/dep-test.list
  #######################################
  
 -# Prepare and run tests
@@ -85,12 +93,16 @@
 -	@echo "$(FAILED_TESTS)"
 -
 -# Generate test results
--$(RES_P)/test_%.txt: $(BIN_P)/test_%
+-$(RES_P)/test_%.txt: $(BIN_P)/test_% $(DEP_P)/dep-test.list
 -	-./$< >$@ 2>&1
 -
--# Create tests' binaries
--$(BIN_P)/test_%: $(OBJ_P)/unity.o $(OBJ_P)/unity_memory.o $(OBJ_P)/test_%_runner.o $(OBJ_P)/test_%.o $(OBJ_P)/%.o
+-# Create tests' binaries (link prepared obj files together and append C std lib)
+-$(BIN_P)/test_%: $(OBJ_P)/unity.o $(OBJ_P)/unity_memory.o $(OBJ_P)/test_%_runner.o $(OBJ_P)/test_%_final.o
 -	$(CC) $^ -o $@
+-
+-# Linking unit tests' modules' objects with their dependencies
+-$(OBJ_P)/test_%_final.o: $(OBJ_P)/test_%.o
+-	$(LINKER) -r -o $@ $(shell ../test/unit/get-dependency-list.sh $(TEST_P) $(OBJ_P) $@)
 -
 -# Compile unit tests' modules
 -$(OBJ_P)/test_%.o: $(TEST_P)/test_%.c
