@@ -21,7 +21,7 @@ string_t *string_create(void)
     if (!string)
         return NULL;
 
-    string->content = malloc(INIT_MAX);
+    string->content = calloc(INIT_MAX, 1);
     if (!string->content) {
         free(string);
         return NULL;
