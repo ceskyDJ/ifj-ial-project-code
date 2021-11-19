@@ -11,3 +11,7 @@ src/dep.list
 # Help files in test/
 # TODO
 
+# Vim trash
+*.c~
+*.h~
+*.un~
