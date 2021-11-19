@@ -101,3 +101,12 @@ char *string_expose(string_t *str)
     return str->content;
 }
 
+void string_clear(string_t *str)
+{
+    assert(str);
+
+    memset(str->content, '\0', str->len);
+
+    str->len = 0;
+}
+

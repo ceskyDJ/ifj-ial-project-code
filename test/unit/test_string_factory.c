@@ -231,3 +231,14 @@ void test_string_expose()
     TEST_ASSERT_EQUAL_STRING(exposed, "hello");
 }
 
+void test_string_clear()
+{
+    string_t *str = string_create();
+    append_to_string(str, "hello");
+
+    string_clear(str);
+
+    TEST_ASSERT_EQUAL_INT(0, str->len);
+    TEST_ASSERT_EQUAL_STRING("", str->content);
+}
+
