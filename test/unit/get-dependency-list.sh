@@ -51,7 +51,8 @@ function fix_paths() {
   # 3. paths of unit test sources to paths of corresponding obj files (after compilation)
   sed -E 's|([a-zA-Z0-9_]+\.h)|'"$OBJ_P"'/\1|g' \
     | sed -E 's|([a-zA-Z0-9_]+)(\.o)|'"$OBJ_P"'/\1_final\2|g' \
-    | sed -E 's|'"$OBJ_P"'/([a-zA-Z0-9_]+\.c)|'"$OBJ_P"'/\1|g'
+    | sed -E 's|'"$OBJ_P"'/([a-zA-Z0-9_]+\.c)|'"$OBJ_P"'/\1|g' \
+    | sed 's|'"$TEST_P"'|'"$OBJ_P"'|'
 }
 
 # Set correct file extensions
