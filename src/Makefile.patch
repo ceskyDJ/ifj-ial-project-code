@@ -1,5 +1,5 @@
---- Makefile.std	2021-11-19 15:59:00.948144130 +0100
-+++ Makefile	2021-11-19 16:06:57.481855321 +0100
+--- Makefile.std	2021-11-23 21:05:43.300288174 +0100
++++ Makefile	2021-11-23 21:06:07.456519626 +0100
 @@ -10,44 +10,24 @@
  
  # Usage:
@@ -42,7 +42,7 @@
 +OBJ_P=.
  
  # Compiler configs
- CC=gcc
+ CC=gcc-10.2
 -LINKER=ld
 -CFLAGS=-std=c11 -g -pedantic -Wall -Wextra $$EXTRA_CFLAGS
 +CFLAGS=-std=c11 -g -pedantic -Wall -Wextra

@@ -9,6 +9,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 10
+          platform: x64
+
+      - name: We need gcc-10.2 but we have gcc-10 only...
+        run: sudo ln -s /usr/bin/gcc-10 /usr/local/bin/gcc-10.2
+
       - name: Run Make rule for creating and running unit tests
         run: cd src; make test && ../test/unit/get-results.sh
         env:
