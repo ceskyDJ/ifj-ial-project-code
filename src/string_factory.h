@@ -102,6 +102,15 @@ char *string_export(string_t *str);
  */
 char *string_expose(string_t *str);
 
+/**
+ * Clears (zeroes out) ADT string for safe repeated use.
+ *
+ * @param str String which to clear.
+ *
+ * @pre str != NULL
+ */
+void string_clear(string_t *str);
+
 struct string {
     size_t len;
     size_t max_len;
