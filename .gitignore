@@ -1,6 +1,6 @@
 # CMake and Make build help files
 cmake-build-debug/
-src/dep.list
+build/
 
 # Help files
 *.o
@@ -8,6 +8,7 @@ src/dep.list
 *.zip
 *.tar.gz
 
-# Help files in test/
-# TODO
-
+# Vim trash
+*.c~
+*.h~
+*.un~
