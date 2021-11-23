@@ -18,9 +18,12 @@
 #define NUMBER_OF_KEYWORDS 15
 
 /**
- * Keyword as simple C string
+ * Keyword in integer-like form for simple comparing
  */
-typedef char *keyword_t;
+typedef enum keywords {
+    KW_DO, KW_ELSE, KW_END, KW_FUNCTION, KW_GLOBAL, KW_IF, KW_INTEGER, KW_LOCAL,
+    KW_NIL, KW_NUMBER, KW_REQUIRE, KW_RETURN, KW_STRING, KW_THEN, KW_WHILE
+} keyword_t;
 
 /**
  * Table of keywords
@@ -41,11 +44,11 @@ kwtable_t *kwtable_create(void);
  *
  * @param table Keywords table to use
  * @param keyword_name Name of the keyword to search for
- * @return Keyword if found otherwise NULL
+ * @return Pointer to keyword if found otherwise NULL
  *
  * @pre table != NULL
  */
-keyword_t kwtable_find(kwtable_t *table, char *keyword_name);
+keyword_t *kwtable_find(kwtable_t *table, char *keyword_name);
 
 /**
  * Destroys keywords table

@@ -1,0 +1,9 @@
+<toolSet name="External Tools">
+  <tool name="Make tests" showInMainMenu="false" showInEditor="false" showInProject="false" showInSearchPopup="false" disabled="false" useConsole="true" showConsoleOnStdOut="false" showConsoleOnStdErr="false" synchronizeAfterRun="false">
+    <exec>
+      <option name="COMMAND" value="make" />
+      <option name="PARAMETERS" value="test" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Projects/School/IFJ/ifj21-compiler/src" />
+    </exec>
+  </tool>
+</toolSet>
