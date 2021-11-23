@@ -36,7 +36,7 @@ kwtable_t *kwtable_create(void)
     return table;
 }
 
-keyword_t kwtable_find(kwtable_t *table, char *keyword_name)
+keyword_t *kwtable_find(kwtable_t *table, char *keyword_name)
 {
     assert(table);
 
@@ -52,7 +52,7 @@ keyword_t kwtable_find(kwtable_t *table, char *keyword_name)
         else if(compare_result > 0)
             left = middle + 1;
         else
-            return (*table)[middle];
+            return &((*table)[middle]);
     }
     while (right >= left);
 

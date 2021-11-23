@@ -45,7 +45,7 @@ kwtable_t *kwtable_create(void);
  *
  * @pre table != NULL
  */
-keyword_t kwtable_find(kwtable_t *table, char *keyword_name);
+keyword_t *kwtable_find(kwtable_t *table, char *keyword_name);
 
 /**
  * Destroys keywords table
