@@ -19,6 +19,15 @@ jobs:
           host: github.com
           private-key: ${{ secrets.SSH_PRIV_KEY }}
 
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 10
+          platform: x64
+
+      - name: We need gcc-10.2 but we have gcc-10 only...
+        run: sudo ln -s /usr/bin/gcc-10 /usr/local/bin/gcc-10.2
+
       - name: Install packages for LaTeX (and BibTeX) compilation
         run: sudo apt install -y texlive texlive-plain-generic texlive-latex-extra texlive-lang-czechslovak texlive-lang-greek texlive-font-utils texlive-bibtex-extra
 

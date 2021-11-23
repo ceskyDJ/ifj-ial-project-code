@@ -45,7 +45,7 @@ PASSED_TESTS = `grep -qs PASS $(RES_P)/*.txt && grep PASS $(RES_P)/*.txt | sed -
 FAILED_TESTS = `grep -qs FAIL[^E] $(RES_P)/*.txt && grep FAIL[^E] $(RES_P)/*.txt | sed -E 's|$(RES_P)/[a-zA-Z_]+\.txt:../||g' || echo "There are no failed tests"`
 
 # Compiler configs
-CC=gcc
+CC=gcc-10.2
 LINKER=ld
 CFLAGS=-std=c11 -g -pedantic -Wall -Wextra $$EXTRA_CFLAGS
 
