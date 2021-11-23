@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CLionExternalBuildManager">
+    <target id="ccd19c1b-2591-419a-9837-cdc421981991" name="Tests" defaultType="TOOL">
+      <configuration id="9954cd13-8c86-477d-93b2-06097ca418c0" name="Tests" toolchainName="Run">
+        <build type="TOOL">
+          <tool actionId="Tool_External Tools_Make tests" />
+        </build>
+      </configuration>
+    </target>
+  </component>
+</project>

@@ -24,7 +24,7 @@ void test_kwtable_destroy_success(void) {
 void test_kwtable_find_non_existing_keyword(void) {
     kwtable_t *table = kwtable_create();
 
-    keyword_t keyword = kwtable_find(table, "non-existing");
+    keyword_t *keyword = kwtable_find(table, "non-existing");
 
     TEST_ASSERT_NULL(keyword);
 }
@@ -32,31 +32,31 @@ void test_kwtable_find_non_existing_keyword(void) {
 void test_kwtable_find_existing_keyword_first(void) {
     kwtable_t *table = kwtable_create();
 
-    keyword_t keyword = kwtable_find(table, "do");
+    keyword_t *keyword = kwtable_find(table, "do");
 
     TEST_ASSERT_NOT_NULL(keyword);
-    TEST_ASSERT_EQUAL_STRING("do", keyword);
+    TEST_ASSERT_EQUAL_INT(KW_DO, *keyword);
 }
 
 void test_kwtable_find_existing_keyword_last(void) {
     kwtable_t *table = kwtable_create();
 
-    keyword_t keyword = kwtable_find(table, "while");
+    keyword_t *keyword = kwtable_find(table, "while");
 
     TEST_ASSERT_NOT_NULL(keyword);
-    TEST_ASSERT_EQUAL_STRING("while", keyword);
+    TEST_ASSERT_EQUAL_INT(KW_WHILE, *keyword);
 }
 
 void test_kwtable_find_more_keywords(void) {
     kwtable_t *table = kwtable_create();
 
-    keyword_t keyword_1 = kwtable_find(table, "if");
-    keyword_t keyword_2 = kwtable_find(table, "elif");
-    keyword_t keyword_3 = kwtable_find(table, "else");
+    keyword_t *keyword_1 = kwtable_find(table, "if");
+    keyword_t *keyword_2 = kwtable_find(table, "elif");
+    keyword_t *keyword_3 = kwtable_find(table, "else");
 
     TEST_ASSERT_NOT_NULL(keyword_1);
-    TEST_ASSERT_EQUAL_STRING("if", keyword_1);
+    TEST_ASSERT_EQUAL_INT(KW_IF, *keyword_1);
     TEST_ASSERT_NULL(keyword_2);
     TEST_ASSERT_NOT_NULL(keyword_3);
-    TEST_ASSERT_EQUAL_STRING("else", keyword_3);
+    TEST_ASSERT_EQUAL_INT(KW_ELSE, *keyword_3);
 }

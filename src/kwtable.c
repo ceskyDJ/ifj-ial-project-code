@@ -15,14 +15,6 @@
 #include <string.h>
 #include <assert.h>
 
-/**
- * Set of allowed keywords
- */
-char *keywords[NUMBER_OF_KEYWORDS] = {
-    "do", "else", "end", "function", "global", "if", "integer", "local", "nil",
-    "number", "require", "return", "string", "then", "while"
-};
-
 kwtable_t *kwtable_create(void)
 {
     kwtable_t *table = malloc(sizeof(kwtable_t));
@@ -30,7 +22,7 @@ kwtable_t *kwtable_create(void)
         return NULL;
 
     for (int i = 0; i < NUMBER_OF_KEYWORDS; i++) {
-        (*table)[i] = keywords[i];
+        (*table)[i] = (keyword_t)i;
     }
 
     return table;
@@ -40,12 +32,18 @@ keyword_t *kwtable_find(kwtable_t *table, char *keyword_name)
 {
     assert(table);
 
+    // Set of allowed keywords in string form
+    char *keywords[NUMBER_OF_KEYWORDS] = {
+            "do", "else", "end", "function", "global", "if", "integer", "local", "nil",
+            "number", "require", "return", "string", "then", "while"
+    };
+
     int left = 0, right = NUMBER_OF_KEYWORDS - 1, middle;
     int compare_result;
 
     do {
         middle = (left + right) / 2;
-        compare_result = strcmp(keyword_name, (*table)[middle]);
+        compare_result = strcmp(keyword_name, keywords[middle]);
 
         if (compare_result < 0)
             right = middle - 1;
