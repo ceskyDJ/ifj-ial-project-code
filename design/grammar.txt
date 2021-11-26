@@ -14,7 +14,9 @@ Dictionary:
 starting non-terminal: PROG
 --- paste what is below to the simulator ---
 
-PROG ::= CODE
+PROG ::= REQUIRE CODE
+
+REQUIRE ::= require "ifj21"
 
 CODE ::= CODE' CODE''
 CODE ::= ''
