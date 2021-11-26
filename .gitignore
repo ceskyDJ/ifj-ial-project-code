@@ -1,6 +1,19 @@
 # CMake and Make build help files
 cmake-build-debug/
 build/
+mimick/**/CMakeFiles
+mimick/**/Makefile
+mimick/**/cmake.check_cache
+mimick/**/cmake_install.cmake
+mimick/**/CMakeCache.txt
+mimick/**/CTestTestfile.cmake
+
+# Mimick library build files
+mimick/src/config.h
+mimick/test/mmk_test
+mimick/sample/strdup/strdup_test
+mimick/libmimick.a
+mimick/**/*.so
 
 # Help files
 *.o

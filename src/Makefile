@@ -38,6 +38,7 @@ RES_P=../build/results
 RUN_P=../build/runners
 # Unity test framework
 UNITY_P=../unity
+MIMICK_P=../mimick
 
 # Test statistics
 IGNORED_TESTS = `grep -qs IGNORE $(RES_P)/*.txt && grep -s IGNORE $(RES_P)/*.txt | sed -E 's|$(RES_P)/[a-zA-Z0-9_]+\.txt:../||g' || echo "There are no ignored tests"`
@@ -113,8 +114,8 @@ $(BIN_P)/test_%: $(OBJ_P)/unity.o $(OBJ_P)/unity_memory.o $(OBJ_P)/test_%_runner
 	$(CC) $^ -o $@
 
 # Linking unit tests' modules' objects with their dependencies
-$(OBJ_P)/test_%_final.o: $(OBJ_P)/test_%.o
-	$(LINKER) -r -o $@ $(shell ../test/unit/get-dependency-list.sh $(TEST_P) $(OBJ_P) $@)
+$(OBJ_P)/test_%_final.o: $(OBJ_P)/test_%.o $(MIMICK_P)/libmimick.a
+	$(LINKER) -r -o $@ $(shell ../test/unit/get-dependency-list.sh $(TEST_P) $(OBJ_P) $@) $(MIMICK_P)/libmimick.a
 
 # Compile unit tests' modules
 $(OBJ_P)/test_%.o: $(TEST_P)/test_%.c
@@ -135,6 +136,10 @@ $(OBJ_P)/unity.o: $(UNITY_P)/src/unity.c $(UNITY_P)/src/unity.h
 # Compile Unity framework's memory add-on module
 $(OBJ_P)/unity_memory.o: $(UNITY_P)/extras/unity_memory.c $(UNITY_P)/extras/unity_memory.h
 	$(CC) $(CFLAGS) -c $< -o $@
+
+# Compile Mimick library
+$(MIMICK_P)/libmimick.a: $(MIMICK_P)/src/*.c $(MIMICK_P)/src/*.h $(MIMICK_P)/include/mimick.h $(MIMICK_P)/include/mimick/*.h
+	cd $(MIMICK_P) && cmake . >/dev/null 2>&1 && make >/dev/null 2>/dev/null
 
 # Don't delete results of explicit rules at the end of rule processing
 .PRECIOUS: $(RUN_P)/%_runner.c
