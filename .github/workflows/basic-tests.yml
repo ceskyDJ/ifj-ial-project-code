@@ -38,7 +38,7 @@ jobs:
         run: mkdir tmp
 
       - name: Prepare test script (apply patch with required modifications for Github Actions)
-        run: cd test/basics; patch is_it_ok.sh is_it_ok.patch
+        run: cd test/basics; patch is_it_ok.sh is_it_ok.sh.patch
 
       - name: Run test script
         run: ./test/basics/is_it_ok.sh xsmahe01.tar.gz ./tmp
