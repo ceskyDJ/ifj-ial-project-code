@@ -1,5 +1,5 @@
 /**
- * @file stack.c
+ * @file symstack.c
  * Stack-like storage for tables of symbols
  *
  * IFJ and IAL project (IFJ21 compiler)
