@@ -8,5 +8,19 @@
         </build>
       </configuration>
     </target>
+    <target id="fe10e715-2462-4003-b280-990b65a1d7dc" name="Sources" defaultType="TOOL">
+      <configuration id="44a9f2ef-153f-4cb3-b41f-d67f6475f8fd" name="Sources" toolchainName="Run">
+        <build type="TOOL">
+          <tool actionId="Tool_External Tools_Compile sources" />
+        </build>
+      </configuration>
+    </target>
+    <target id="9f2db2cf-1069-4581-83f8-dd153230051f" name="Manual tests" defaultType="TOOL">
+      <configuration id="9493972a-2f06-48cf-8cb8-b215aeaaac99" name="Manual tests" toolchainName="Run">
+        <build type="TOOL">
+          <tool actionId="Tool_External Tools_Make manual tests" />
+        </build>
+      </configuration>
+    </target>
   </component>
 </project>
