@@ -1,16 +1,19 @@
 #!/bin/bash
 
 # Paths are relative from caller's directory
-# $1 - Path to directory with unit tests
+# $1 - Path to directory with manual tests
 # $2 - Path to directory with object files
-# $3 - Name of target for filtering - only dependencies for this target will be written (optional)
+# $3 - Path to directory with binary files
+# $4 - Name of target for filtering - only dependencies for this target will be written (optional)
 
-# Unit test sources
+# Manual test sources
 TEST_P=$1
 # Directories with obj files
 OBJ_P=$2
+# Directory for storing binary files
+BIN_P=$3
 
-# Generates dependencies using gcc (in format: unit test source file + needed header files)
+# Generates dependencies using gcc (in format: manual test source file + needed header files)
 function get_dependencies_from_gcc() {
   gcc -MM "$TEST_P"/test_*.c
 }
@@ -18,12 +21,6 @@ function get_dependencies_from_gcc() {
 # Trims whitespaces at the start of some rows
 function trim_whitespaces() {
   sed -E 's/^ //'
-}
-
-# Removes Unity framework files (these are static and are resolved elsewhere)
-function remove_unity_stuff() {
-  # Inverted grep is used here (when the rule is accepted, the row is thrown away)
-  grep -Ev "unity(_internals)?.h"
 }
 
 # Format to one dependency per line (needed for filter_modules function)
@@ -76,11 +73,11 @@ function parse_into_rules() {
 # Fixes some of the used paths
 function fix_paths() {
   # 1. paths of header files (dependencies from src/) to paths of corresponding obj files (after compilation)
-  # 2. paths to final linked obj file with compiled unit test for some module and all of its dependencies (targets)
-  # 3. paths of unit test sources to paths of corresponding obj files (after compilation)
+  # 2. paths to final linked obj file with compiled manual test for some module and all of its dependencies (targets)
+  # 3. paths of manual test sources to paths of corresponding obj files (after compilation)
   sed -E 's|([a-zA-Z0-9_]+\.h)|'"$OBJ_P"'/\1|g' \
-    | sed -E 's|([a-zA-Z0-9_]+)(\.o)|'"$OBJ_P"'/\1_final\2|g' \
-    | sed 's|'"$TEST_P"'|'"$OBJ_P"'|'
+    | sed -E 's|test_([a-zA-Z0-9_]+)\.o|'"$BIN_P"'/\1.mantest|g' \
+    | sed 's|'"$TEST_P"/'|'"$OBJ_P"/man'|'
 }
 
 # Set correct file extensions
@@ -90,16 +87,16 @@ function set_extensions() {
   sed -E 's/\.[ch]/.o/g'
 }
 
-# Get all rules for unit test linker
+# Get all rules for manual test linker
 function get_all() {
-  get_dependencies_from_gcc | trim_whitespaces | remove_unity_stuff | one_dep_per_line | filter_modules \
-    | parse_into_rules | fix_paths | set_extensions
+  get_dependencies_from_gcc | trim_whitespaces | one_dep_per_line | filter_modules  | parse_into_rules | fix_paths \
+    | set_extensions
 }
 
 # Control space
-if [ $# -ge 3 ]; then
+if [ $# -ge 4 ]; then
   # Optional argument supplied --> filter output to dependencies of specified target
-  get_all | grep "$3" | sed -E "s/.+: //"
+  get_all | grep "$4" | sed -E "s/.+: //"
 else
   # Without optional argument --> return all of the rules
   get_all

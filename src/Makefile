@@ -22,14 +22,16 @@
 # $< ... first dependency
 # $^ ... all dependencies
 # $@ ... target
+# $* ... % from rule header
 
 BINARY_NAME=ifj21_compiler
 DOC_NAME=main
 
 # Project sources
 SRC_P=.
-# Unit test sources
-TEST_P=../test/unit
+# Test sources (U = Unit, M = Manual)
+U_TEST_P=../test/unit
+M_TEST_P=../test/manual
 # Directories with build data
 BIN_P=../build/bin
 DEP_P=../build/deps
@@ -58,12 +60,16 @@ HDR_FILES=$(wildcard $(SRC_P)/*.h)
 # so we can just change extension and path and we're done
 MODULES=$(patsubst $(SRC_P)/%.c, $(OBJ_P)/%.o, $(SRC_FILES))
 # Get a list of all unit test source files (similar to SRC_FILES)
-TEST_FILES=$(wildcard $(TEST_P)/*.c)
+U_TEST_FILES=$(wildcard $(U_TEST_P)/test_*.c)
+# Get a list of all manual test source files (similar to SRC_FILES and U_TEST_FILES)
+M_TEST_FILES=$(wildcard $(M_TEST_P)/test_*.c)
 # Transform the list of unit tests' source files into a list of test output files (similar to MODULES)
-TEST_OUTPUTS=$(patsubst $(TEST_P)/%.c, $(RES_P)/%.txt, $(TEST_FILES))
+U_TEST_OUTPUTS=$(patsubst $(U_TEST_P)/%.c, $(RES_P)/%.txt, $(U_TEST_FILES))
+# Transform the list of manual tests' source files into a list of their binaries (similar to MODULES)
+M_TESTS_BINS=$(patsubst $(M_TEST_P)/test_%.c, $(BIN_P)/%.mantest, $(M_TEST_FILES))
 
 # Define virtual files
-.PHONY: all test archive clean cleanall
+.PHONY: all test mantest archive clean cleanall
 
 # `make` only compiles main binary
 all: $(BIN_P)/$(BINARY_NAME)
@@ -82,15 +88,19 @@ $(BIN_P)/$(BINARY_NAME): $(DEP_P)/dep-src.list $(MODULES)
 $(DEP_P)/dep-src.list: $(SRC_FILES) $(HDR_FILES)
 	$(SRC_P)/get-dependency-list.sh $(SRC_P) $(OBJ_P) >$@
 
-$(DEP_P)/dep-test.list: $(TEST_FILES)
-	$(TEST_P)/get-dependency-list.sh $(TEST_P) $(OBJ_P) >$@
+$(DEP_P)/dep-u-test.list: $(U_TEST_FILES)
+	$(U_TEST_P)/get-dependency-list.sh $(U_TEST_P) $(OBJ_P) >$@
+
+$(DEP_P)/dep-m-test.list: $(M_TEST_FILES)
+	$(M_TEST_P)/get-dependency-list.sh $(M_TEST_P) $(OBJ_P) $(BIN_P) >$@
 
 -include $(DEP_P)/dep-src.list
--include $(DEP_P)/dep-test.list
+-include $(DEP_P)/dep-u-test.list
+-include $(DEP_P)/dep-m-test.list
 #######################################
 
 # Prepare and run tests
-test: $(TEST_OUTPUTS)
+test: $(U_TEST_OUTPUTS)
 	@echo '--------------------------'
 	@echo '          IGNORE          '
 	@echo '--------------------------'
@@ -107,19 +117,19 @@ test: $(TEST_OUTPUTS)
 	@echo "$(FAILED_TESTS)"
 
 # Generate test results
-$(RES_P)/test_%.txt: $(BIN_P)/test_% $(DEP_P)/dep-test.list
+$(RES_P)/test_%.txt: $(BIN_P)/test_% $(DEP_P)/dep-u-test.list
 	-./$< >$@ 2>&1
 
-# Create tests' binaries (link prepared obj files together and append C std lib)
+# Create unit tests' binaries (link prepared obj files together and append C std lib)
 $(BIN_P)/test_%: $(OBJ_P)/unity.o $(OBJ_P)/unity_memory.o $(OBJ_P)/test_%_runner.o $(OBJ_P)/test_%_final.o
 	$(CC) $^ -o $@
 
 # Linking unit tests' modules' objects with their dependencies
 $(OBJ_P)/test_%_final.o: $(OBJ_P)/test_%.o $(MODULES)
-	$(LINKER) -r -o $@ $(shell ../test/unit/get-dependency-list.sh $(TEST_P) $(OBJ_P) $@)
+	$(LINKER) -r -o $@ $(shell $(U_TEST_P)/get-dependency-list.sh $(U_TEST_P) $(OBJ_P) $@)
 
 # Compile unit tests' modules
-$(OBJ_P)/test_%.o: $(TEST_P)/test_%.c
+$(OBJ_P)/test_%.o: $(U_TEST_P)/test_%.c
 	$(CC) $(CFLAGS) -c $< -o $@ -DTEST
 
 # Compile unit test runners' modules
@@ -127,7 +137,7 @@ $(OBJ_P)/%_runner.o: $(RUN_P)/%_runner.c
 	$(CC) $(CFLAGS) -c $< -o $@ -DTEST
 
 # Generate unit test runners' source code
-$(RUN_P)/%_runner.c: $(TEST_P)/%.c
+$(RUN_P)/%_runner.c: $(U_TEST_P)/%.c
 	ruby $(UNITY_P)/auto/generate_test_runner.rb $< $@
 
 # Compile Unity framework's main module
@@ -144,6 +154,22 @@ $(OBJ_P)/unity_memory.o: $(UNITY_P)/extras/unity_memory.c $(UNITY_P)/extras/unit
 .PRECIOUS: $(OBJ_P)/test_%.o
 .PRECIOUS: $(BIN_P)/test_%
 .PRECIOUS: $(RES_P)/test_%.txt
+
+# Build manual tests
+mantest: $(M_TESTS_BINS)
+	@echo "-----------------------"
+	@echo "Available manual tests:"
+	@echo "$(M_TESTS_BINS)" | sed -E 's/ /- /' | sed -E 's/  /\n- /g'
+
+# Create manual tests' binaries (link prepared obj files together and append C std lib)
+$(BIN_P)/%.mantest: $(OBJ_P)/mantest_%.o $(MODULES)
+	$(CC) $(CFLAGS) -o $@ $(shell $(M_TEST_P)/get-dependency-list.sh $(M_TEST_P) $(OBJ_P) $(BIN_P) $(OBJ_P)/mantest_$*.o)
+
+# Compile manual tests' modules
+$(OBJ_P)/mantest_%.o: $(M_TEST_P)/test_%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+.PRECIOUS: $(OBJ_P)/mantest_%.o
 
 # Create final archive
 archive:
