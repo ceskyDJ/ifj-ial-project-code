@@ -7,7 +7,7 @@
 
 # Unit test sources
 TEST_P=$1
-# Directories with build data
+# Directories with obj files
 OBJ_P=$2
 
 # Generates dependencies using gcc (in format: unit test source file + needed header files)
