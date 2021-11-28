@@ -29,6 +29,9 @@ typedef struct context {
     symstack_t *symstack;
     kwtable_t *kwtable;
     string_t *string;
+    identifier_t *saved_id;
+    string_t *param;
+    string_t *retval;
 } context_t;
 
 #endif // _CONTEXT_H_
