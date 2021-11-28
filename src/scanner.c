@@ -362,6 +362,10 @@ token_t get_next_token(context_t *context)
             case S_STR_IN:
                 if (c == '"')
                     state = S_STR_OUT;
+                else if (c == '\n') {
+                    LOG_ERROR_M("Invalid string literal. Missing closing quotes!");
+                    exit(ELEX);
+                }
                 else if (c == '\\')
                     state = S_ESCAPE;
                 else {
