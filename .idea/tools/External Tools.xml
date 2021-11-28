@@ -6,4 +6,18 @@
       <option name="WORKING_DIRECTORY" value="$USER_HOME$/Projects/School/IFJ/ifj21-compiler/src" />
     </exec>
   </tool>
+  <tool name="Compile sources" showInMainMenu="false" showInEditor="false" showInProject="false" showInSearchPopup="false" disabled="false" useConsole="true" showConsoleOnStdOut="true" showConsoleOnStdErr="true" synchronizeAfterRun="false">
+    <exec>
+      <option name="COMMAND" value="make" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Projects/School/IFJ/ifj21-compiler/src" />
+    </exec>
+  </tool>
+  <tool name="Make manual tests" showInMainMenu="false" showInEditor="false" showInProject="false" showInSearchPopup="false" disabled="false" useConsole="true" showConsoleOnStdOut="true" showConsoleOnStdErr="true" synchronizeAfterRun="false">
+    <exec>
+      <option name="COMMAND" value="make" />
+      <option name="PARAMETERS" value="mantest" />
+      <option name="WORKING_DIRECTORY" />
+    </exec>
+  </tool>
 </toolSet>
