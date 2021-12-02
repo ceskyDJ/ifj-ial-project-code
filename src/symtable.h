@@ -14,43 +14,14 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-#define SYMTABLE_BUCKETS 23
+#include "identifier.h"
 
-enum variable_type {
-    VAR_INTEGER='i', VAR_NUMBER='n', VAR_STRING='s'
-};
-enum identifier_type {
-    VARIABLE=1, FUNCTION
-};
+#define SYMTABLE_BUCKETS 23
 
 /**
  * Symbol table abstract data type.
  */
 typedef struct symtable symtable_t;
-
-
-/**
- * Structure representing an identifier,
- * an element of symtable.
- */
-typedef struct identifier {
-    char *name;
-    unsigned long line;
-    unsigned long character;
-    enum identifier_type type;
-    union {
-        struct variable {
-            char type;
-            int init;
-            int used;
-        } var;
-        struct function {
-            int defined;
-            char *param; // "" -> takes void
-            char *retval; // "" -> returns void
-        } fun;
-    };
-} identifier_t;
 
 typedef struct symtable_item {
     identifier_t identifier;
