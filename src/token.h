@@ -19,7 +19,7 @@ enum token_type {
     // Symbols
     IDENTIFIER, KEYWORD,
     // Literals
-    INTEGER, NUMBER, STRING,
+    INTEGER, NUMBER, STRING, BOOL,
     // Assignment operators
     ASSIGNMENT,
     // Math operators
