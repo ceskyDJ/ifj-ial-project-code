@@ -12,7 +12,7 @@
 #define _IDENTIFIER_H_
 
 enum variable_type {
-    VAR_INTEGER='i', VAR_NUMBER='n', VAR_STRING='s'
+    VAR_INTEGER='i', VAR_NUMBER='n', VAR_STRING='s', VAR_BOOL='b'
 };
 enum identifier_type {
     VARIABLE=1, FUNCTION
