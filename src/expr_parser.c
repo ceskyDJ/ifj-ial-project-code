@@ -16,6 +16,7 @@
 #include "logger.h"
 #include "symtable.h"
 #include "symstack.h"
+#include "generator.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -180,13 +181,13 @@ static enum expr_parser_operations *table_lookup(token_t on_stack, token_t input
 static bool try_implicit_conversion(non_term_t *first_op, non_term_t *second_op)
 {
     if (first_op->data.type == INTEGER && second_op->data.type == NUMBER) {
-        /* TODO: conv_prev_to_number() */
+        gen_conv_to_number_subtop();
         first_op->data.type = NUMBER;
         LOG_DEBUG_M("Applying implicit conversion from integer to number for the previous operand...");
 
         return true;
     } else if (first_op->data.type == NUMBER && second_op->data.type == INTEGER) {
-        /* TODO: conv_curr_to_number()*/
+        gen_conv_to_number_top();
         second_op->data.type = NUMBER;
         LOG_DEBUG_M("Applying implicit conversion from integer to number for the current operand...");
 
@@ -227,7 +228,7 @@ static bool is_valid_variable(context_t *ctx, token_t *token)
         symtable = symstack_get(ctx->symstack);
         tmp_id = symtable_find(symtable, token->identifier->name);
 
-        if (tmp_id->type == VARIABLE) {
+        if (tmp_id && tmp_id->type == VARIABLE) {
             // It's a valid variable, so we are done here
             token->identifier = tmp_id;
             return true;
@@ -255,13 +256,14 @@ static non_term_t strlen_rule(exprstack_t *s)
     operand = exprstack_top_non_term(s);
 
     CHECK_TYPE(operand, STRING);
-    // TODO: gen_check_nil()
+    gen_nil_check_top();
 
     // Set result type of expression
     result_non_term.type = N_EXPR;
     result_non_term.data.type = INTEGER;
 
-    // TODO: semantic actions
+    // Semantic actions for generating code
+    gen_operation(strlen_term.type);
 
     return result_non_term;
 }
@@ -284,9 +286,9 @@ static non_term_t mul_rule(exprstack_t *s)
     first_op = exprstack_next_non_term(s);
 
     CHECK_NUMERIC(first_op);
-    // TODO: gen_check_nil()
+    gen_nil_check_subtop();
     CHECK_NUMERIC(second_op);
-    // TODO: gen_check_nil()
+    gen_nil_check_top();
 
     // Implicit conversion integer --> number
     try_implicit_conversion(first_op, second_op);
@@ -298,7 +300,8 @@ static non_term_t mul_rule(exprstack_t *s)
     else
         result_non_term.data.type = NUMBER;
 
-    // TODO: semantic actions
+    // Semantic actions for generating code
+    gen_operation(mul_term.type);
 
     return result_non_term;
 }
@@ -321,8 +324,9 @@ static non_term_t div_rule(exprstack_t *s)
     first_op = exprstack_next_non_term(s);
 
     CHECK_NUMERIC(first_op);
-    // TODO: gen_check_nil()
+    gen_nil_check_subtop();
     CHECK_NUMERIC(second_op);
+    gen_nil_check_top();
     if (second_op->type == N_VAL) {
         if ((second_op->data.type == INTEGER && second_op->data.integer == 0)
             || (second_op->data.type == NUMBER && second_op->data.number == 0.0)) {
@@ -330,17 +334,23 @@ static non_term_t div_rule(exprstack_t *s)
             exit(EZERODIV);
         }
     }
-    // TODO: gen_check_nil()
-    // TODO: gen_check_zero()
+    gen_zero_div_check();
 
     // Implicit conversion integer --> number
     try_implicit_conversion(first_op, second_op);
+
+    // Both operands must be of type number
+    if (first_op->data.type == INTEGER && second_op->data.type == INTEGER) {
+        gen_conv_to_number_subtop();
+        gen_conv_to_number_top();
+    }
 
     // Set result type of expression
     result_non_term.type = N_EXPR;
     result_non_term.data.type = NUMBER;
 
-    // TODO: semantic actions
+    // Semantic actions for generating code
+    gen_operation(div_term.type);
 
     return result_non_term;
 }
@@ -364,19 +374,20 @@ static non_term_t int_div_rule(exprstack_t *s)
 
     CHECK_TYPE(first_op, INTEGER);
     CHECK_TYPE(second_op, INTEGER);
-    // TODO: gen_check_nil()
+    gen_nil_check_subtop();
     if (second_op->data.integer == 0) {
         LOG_ERROR_M("Division by zero literal in expression");
         exit(EZERODIV);
     }
-    // TODO: gen_check_nil()
-    // TODO: gen_check_zero()
+    gen_nil_check_top();
+    gen_zero_div_check();
 
     // Set result type of expression
     result_non_term.type = N_EXPR;
     result_non_term.data.type = INTEGER;
 
-    // TODO: semantic actions
+    // Semantic actions for generating code
+    gen_operation(int_div_term.type);
 
     return result_non_term;
 }
@@ -399,9 +410,9 @@ static non_term_t add_rule(exprstack_t *s)
     first_op = exprstack_next_non_term(s);
 
     CHECK_NUMERIC(first_op);
-    // TODO: gen_check_nil()
+    gen_nil_check_subtop();
     CHECK_NUMERIC(second_op);
-    // TODO: gen_check_nil()
+    gen_nil_check_top();
 
     // Implicit conversion integer --> number
     try_implicit_conversion(first_op, second_op);
@@ -413,7 +424,8 @@ static non_term_t add_rule(exprstack_t *s)
     else
         result_non_term.data.type = NUMBER;
 
-    // TODO: semantic actions
+    // Semantic actions for generating code
+    gen_operation(add_term.type);
 
     return result_non_term;
 }
@@ -436,9 +448,9 @@ static non_term_t sub_rule(exprstack_t *s)
     first_op = exprstack_next_non_term(s);
 
     CHECK_NUMERIC(first_op);
-    // TODO: gen_check_nil()
+    gen_nil_check_subtop();
     CHECK_NUMERIC(second_op);
-    // TODO: gen_check_nil()
+    gen_nil_check_top();
 
     // Implicit conversion integer --> number
     try_implicit_conversion(first_op, second_op);
@@ -450,7 +462,8 @@ static non_term_t sub_rule(exprstack_t *s)
     else
         result_non_term.data.type = NUMBER;
 
-    // TODO: semantic actions
+    // Semantic actions for generating code
+    gen_operation(sub_term.type);
 
     return result_non_term;
 }
@@ -473,15 +486,16 @@ static non_term_t concat_rule(exprstack_t *s)
     first_op = exprstack_next_non_term(s);
 
     CHECK_TYPE(first_op, STRING);
-    // TODO: gen_check_nil()
+    gen_nil_check_subtop();
     CHECK_TYPE(second_op, STRING);
-    // TODO: gen_check_nil()
+    gen_nil_check_top();
 
     // Set result type of expression
     result_non_term.type = N_EXPR;
     result_non_term.data.type = STRING;
 
-    // TODO: semantic actions
+    // Semantic actions for generating code
+    gen_operation(concat_term.type);
 
     return result_non_term;
 }
@@ -504,14 +518,15 @@ static non_term_t lt_rule(exprstack_t *s)
     first_op = exprstack_next_non_term(s);
 
     check_same_types(first_op, second_op, false);
-    // TODO: gen_check_nil()
-    // TODO: gen_check_nil()
+    gen_nil_check_subtop();
+    gen_nil_check_top();
 
     // Set result type of expression
     result_non_term.type = N_EXPR;
     result_non_term.data.type = BOOL;
 
-    // TODO: semantic actions
+    // Semantic actions for generating code
+    gen_operation(lt_term.type);
 
     return result_non_term;
 }
@@ -534,14 +549,15 @@ static non_term_t leq_rule(exprstack_t *s)
     first_op = exprstack_next_non_term(s);
 
     check_same_types(first_op, second_op, false);
-    // TODO: gen_check_nil()
-    // TODO: gen_check_nil()
+    gen_nil_check_subtop();
+    gen_nil_check_top();
 
     // Set result type of expression
     result_non_term.type = N_EXPR;
     result_non_term.data.type = BOOL;
 
-    // TODO: semantic actions
+    // Semantic actions for generating code
+    gen_operation(leq_term.type);
 
     return result_non_term;
 }
@@ -564,14 +580,15 @@ static non_term_t gt_rule(exprstack_t *s)
     first_op = exprstack_next_non_term(s);
 
     check_same_types(first_op, second_op, false);
-    // TODO: gen_check_nil()
-    // TODO: gen_check_nil()
+    gen_nil_check_subtop();
+    gen_nil_check_top();
 
     // Set result type of expression
     result_non_term.type = N_EXPR;
     result_non_term.data.type = BOOL;
 
-    // TODO: semantic actions
+    // Semantic actions for generating code
+    gen_operation(gt_term.type);
 
     return result_non_term;
 }
@@ -594,14 +611,15 @@ static non_term_t geq_rule(exprstack_t *s)
     first_op = exprstack_next_non_term(s);
 
     check_same_types(first_op, second_op, false);
-    // TODO: gen_check_nil()
-    // TODO: gen_check_nil()
+    gen_nil_check_subtop();
+    gen_nil_check_top();
 
     // Set result type of expression
     result_non_term.type = N_EXPR;
     result_non_term.data.type = BOOL;
 
-    // TODO: semantic actions
+    // Semantic actions for generating code
+    gen_operation(geq_term.type);
 
     return result_non_term;
 }
@@ -629,7 +647,8 @@ static non_term_t eq_rule(exprstack_t *s)
     result_non_term.type = N_EXPR;
     result_non_term.data.type = BOOL;
 
-    // TODO: semantic actions
+    // Semantic actions for generating code
+    gen_operation(eq_term.type);
 
     return result_non_term;
 }
@@ -657,7 +676,8 @@ static non_term_t neq_rule(exprstack_t *s)
     result_non_term.type = N_EXPR;
     result_non_term.data.type = BOOL;
 
-    // TODO: semantic actions
+    // Semantic actions for generating code
+    gen_operation(neq_term.type);
 
     return result_non_term;
 }
@@ -697,28 +717,24 @@ static non_term_t term_rule(exprstack_t *s)
     identifier_t identifier;
     token_t *top_term;
 
-    // Literals and identifiers inherits data from token
+    // Get terminal's token from the top of the exprstack
     top_term = exprstack_top_term(s);
-    if (top_term)
-        // There could be no terminal at the top of the stack (this is before testing rules)
-        result_non_term.data = *top_term;
+    if (!top_term)
+        // There is no terminal at the top, so no term rule will pass
+        return result_non_term;
+
+    // Literals and identifiers inherits data from token
+    result_non_term.data = *top_term;
 
     if (exprstack_check_top(s, "T", int_term)) {
         LOG_DEBUG_M("Used rule: N <-- T (T = integer)");
         result_non_term.data.type = INTEGER;
-
-        // TODO: semantic actions
     } else if (exprstack_check_top(s, "T", num_term)) {
         LOG_DEBUG_M("Used rule: N <-- T (T = number)");
         result_non_term.data.type = NUMBER;
-
-        // TODO: semantic actions
-
     } else if (exprstack_check_top(s, "T", str_term)) {
         LOG_DEBUG_M("Used rule: N <-- T (T = string)");
         result_non_term.data.type = STRING;
-
-        // TODO: semantic actions
     } else if (exprstack_check_top(s, "T", id_term)) {
         LOG_DEBUG_M("Used rule: N <-- T (T = identifier)");
 
@@ -740,20 +756,17 @@ static non_term_t term_rule(exprstack_t *s)
                 result_non_term.data.type = END;
                 break;
         }
-
-        // TODO: semantic actions
     } else if (exprstack_check_top(s, "T", nil_term)) {
         LOG_DEBUG_M("Used rule: N <-- T (T = nil)");
         result_non_term.data.type = NIL;
-
-        // TODO: semantic actions
     } else
         return result_non_term;
 
     // We always reduce simple term
     result_non_term.type = N_VAL;
 
-    // TODO: semantic actions
+    // Semantic actions for generating code
+    gen_push_term(top_term);
 
     return result_non_term;
 }
@@ -801,17 +814,17 @@ enum variable_type expr_parser_start(context_t *context)
 
         switch (*operation) {
             case R_PSH:
-                if (input_token.type == IDENTIFIER && !is_valid_variable(context, &input_token)) {
-                    LOG_ERROR_M("Operand isn't variable");
-                    exit(ESEM_OTHER); // FIXME: maybe another type of error
-                }
-
                 LOG_DEBUG_M("Selected operation (from precedence table): PUSH");
                 exprstack_push_term(exprstack, input_token);
 
                 print_exprstack(exprstack);
                 break;
             case R_SHT:
+                if (input_token.type == IDENTIFIER && !is_valid_variable(context, &input_token)) {
+                    LOG_ERROR_M("Operand isn't variable");
+                    exit(ESEM_OTHER); // FIXME: maybe another type of error
+                }
+
                 LOG_DEBUG_M("Selected operation (from precedence table): SHIFT");
                 exprstack_add_stop_after_top_term(exprstack);
                 exprstack_push_term(exprstack, input_token);
@@ -863,6 +876,9 @@ enum variable_type expr_parser_start(context_t *context)
     }
 
     LOG_DEBUG_M("Switching back to top-to-bottom syntactic analysis...");
+
+    // Clean up jobs
+    exprstack_destroy(exprstack);
 
     // Return type of the expression result
     if (rule_exec_result.data.type == INTEGER)
