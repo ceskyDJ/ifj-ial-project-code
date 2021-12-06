@@ -14,6 +14,7 @@
 #include "symstack.h"
 #include "kwtable.h"
 #include "string_factory.h"
+#include "symqueue.h"
 
 /**
  * Context for lexical and syntactical analysis
@@ -32,6 +33,7 @@ typedef struct context {
     identifier_t *saved_id;
     string_t *param;
     string_t *retval;
+    symqueue_t *symqueue;
 } context_t;
 
 #endif // _CONTEXT_H_
