@@ -1,0 +1,19 @@
+name: 'Automation | Points counter'
+
+on:
+  issues:
+    types: [closed]
+  pull_request:
+    types: [closed]
+
+jobs:
+  # Recount points after closing issue or pull request
+  set-as-in-progress:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Count points
+        run: ./count-points.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.POINTS_COUNTING_TOKEN }}
