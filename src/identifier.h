@@ -35,6 +35,7 @@ typedef struct identifier {
         } var;
         struct function {
             int defined;
+            bool called;
             char *param; // "" -> takes void
             char *retval; // "" -> returns void
         } fun;
