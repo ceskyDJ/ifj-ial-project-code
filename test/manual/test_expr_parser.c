@@ -1,5 +1,6 @@
 #include "../../src/expr_parser.h"
 #include "../../src/logger.h"
+#include "../../src/generator.h"
 
 int main(void)
 {
