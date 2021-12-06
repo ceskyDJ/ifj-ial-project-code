@@ -42,6 +42,10 @@ int main() {
     if (!retval)
         exit(EINTERNAL);
 
+    symqueue_t *symqueue = symqueue_create();
+    if (!symqueue)
+        exit(EINTERNAL);
+
     // TODO fill global_symtable with builtin functions
 
     ret = symstack_push(symstack, global_symtable);
@@ -53,6 +57,7 @@ int main() {
     ctx.string = string;
     ctx.param = param;
     ctx.retval = retval;
+    ctx.symqueue = symqueue;
 
     parser_start(&ctx);
 
@@ -72,6 +77,8 @@ int main() {
     kwtable_destroy(kwtable);
     symtable_destroy(global_symtable);
     symstack_destroy(symstack);
-
+    while (!symqueue_is_empty(symqueue))
+        symqueue_pop(symqueue);
+    symqueue_destroy(symqueue);
     return 0;
 }
