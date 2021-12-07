@@ -184,10 +184,13 @@ int main() {
     gen_zero_div_check();
 
     printf("\n#-----GEN_CONV_TO_NUMBER_TOP-----\n");
-    gen_conv_to_number_top(); 
+    gen_conv_to_number_top();
 
     printf("\n#-----GEN_CONV_TO_NUMBER_SUBTOP-----\n");
     gen_conv_to_number_subtop();
+
+    printf("\n#-----GEN_BUILTINS-----\n");
+    gen_builtins();
 
     return 0;
 }

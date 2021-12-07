@@ -6,6 +6,7 @@
  * Team: 128 (variant II)
  *
  * @author Martin Havlík (xhavli56)
+ * @author Michal Šmahel (xsmahe01)
  */
 
 #include "exit_codes.h"
@@ -37,9 +38,243 @@ static unsigned int nil_check_cnt = 1;
 static unsigned int zero_div_check_cnt = 1;
 static unsigned int return_assign_cnt = 1;
 
+void gen_reads(void)
+{
+    printf("# reads(): string\n");
+    printf("LABEL &reads\n");
+    printf("PUSHFRAME\n");
+
+    printf("DEFVAR LF@%%retval_1\n");
+
+    printf("READ LF@%%retval_1 string\n");
+
+    printf("POPFRAME\n");
+    printf("RETURN\n");
+}
+
+void gen_readi(void)
+{
+    printf("# readi(): integer\n");
+    printf("LABEL &readi\n");
+    printf("PUSHFRAME\n");
+
+    printf("DEFVAR LF@%%retval_1\n");
+
+    printf("READ LF@%%retval_1 int\n");
+
+    printf("POPFRAME\n");
+    printf("RETURN\n");
+}
+
+void gen_readn(void)
+{
+    printf("# readn(): number\n");
+    printf("LABEL &readn\n");
+    printf("PUSHFRAME\n");
+
+    printf("DEFVAR LF@%%retval_1\n");
+
+    printf("READ LF@%%retval_1 float\n");
+
+    printf("POPFRAME\n");
+    printf("RETURN\n");
+}
+
+void gen_write(void)
+{
+    printf("# write(any)\n");
+    printf("LABEL &write\n");
+    printf("PUSHFRAME\n");
+
+    printf("DEFVAR LF@$type\n");
+
+    printf("TYPE LF@$type LF@%%1\n");
+    printf("JUMPIFEQ &if_nil_%u LF@$type string@nil\n", if_cnt);
+    printf("WRITE LF@%%1\n");
+    printf("JUMP &if_end_%u\n", if_cnt);
+    printf("LABEL &if_nil_%u\n", if_cnt);
+    printf("WRITE string@nil\n");
+    printf("LABEL &if_end_%u\n", if_cnt);
+    if_cnt++;
+
+    printf("POPFRAME\n");
+    printf("RETURN\n");
+}
+
+void gen_tointeger(void)
+{
+    printf("# tointeger(number): integer\n");
+    printf("LABEL &tointeger\n");
+    printf("PUSHFRAME\n");
+
+    printf("DEFVAR LF@%%retval_1\n");
+    printf("MOVE LF@%%retval_1 nil@nil\n");
+    printf("DEFVAR LF@$type\n");
+
+    printf("TYPE LF@$type LF@%%1\n");
+    printf("JUMPIFEQ &if_nil_%u LF@$type string@nil\n", if_cnt);
+    printf("FLOAT2INT LF@%%retval_1 LF@%%1\n");
+    printf("LABEL &if_nil_%u\n", if_cnt);
+    if_cnt++;
+
+    printf("POPFRAME\n");
+    printf("RETURN\n");
+}
+
+void gen_substr(void)
+{
+    printf("# substr(string, number, number): string\n");
+    printf("LABEL &substr\n");
+    printf("PUSHFRAME\n");
+
+    printf("DEFVAR LF@%%retval_1\n");
+    printf("DEFVAR LF@$tmp_c\n");
+    printf("DEFVAR LF@$counter\n");
+    printf("DEFVAR LF@$limit\n");
+    printf("DEFVAR LF@$type\n");
+    printf("DEFVAR LF@$lim_cond\n");
+    printf("DEFVAR LF@$lim_cond_2\n");
+    printf("DEFVAR LF@$len\n");
+
+    printf("# 1st param != nil\n");
+    printf("TYPE LF@$type LF@%%1\n");
+    printf("JUMPIFEQ &if_nil_%u LF@$type string@nil\n", if_cnt);
+    printf("# 2nd param != nil\n");
+    printf("TYPE LF@$type LF@%%2\n");
+    printf("JUMPIFEQ &if_nil_%u LF@$type string@nil\n", if_cnt);
+    printf("# 3rd param != nil\n");
+    printf("TYPE LF@$type LF@%%3\n");
+    printf("JUMPIFEQ &if_nil_%u LF@$type string@nil\n", if_cnt);
+    printf("JUMP &if_end_%u\n", if_cnt);
+    printf("# Bad param error\n");
+    printf("LABEL &if_nil_%u\n", if_cnt);
+    printf("EXIT int@8\n");
+    printf("LABEL &if_end_%u\n", if_cnt);
+    if_cnt++;
+
+    printf("FLOAT2INT LF@$counter LF@%%2\n");
+    printf("FLOAT2INT LF@$limit LF@%%3\n");
+    printf("# Limits checks\n");
+    printf("STRLEN LF@$len LF@%%1\n");
+    printf("LT LF@$lim_cond LF@$counter int@1\n");
+    printf("GT LF@$lim_cond_2 LF@$counter LF@$limit\n");
+    printf("OR LF@$lim_cond LF@$lim_cond LF@$lim_cond_2\n");
+    printf("GT LF@$lim_cond_2 LF@$limit LF@$len\n");
+    printf("OR LF@$lim_cond LF@$lim_cond LF@$lim_cond_2\n");
+    printf("JUMPIFEQ &if_lim_bad_%u LF@$lim_cond bool@true\n", if_cnt);
+    printf("SUB LF@$counter LF@$counter int@1\n");
+
+    printf("# Create result string\n");
+    printf("MOVE LF@%%retval_1 string@\n");
+    printf("LABEL &while_%u\n", while_cnt);
+    printf("JUMPIFEQ &while_end_%u LF@$counter LF@$limit\n", while_cnt);
+    printf("GETCHAR LF@$tmp_c LF@%%1 LF@$counter\n");
+    printf("CONCAT LF@%%retval_1 LF@%%retval_1 LF@$tmp_c\n");
+    printf("ADD LF@$counter LF@$counter int@1\n");
+    printf("JUMP &while_%u\n", while_cnt);
+    printf("LABEL &while_end_%u\n", while_cnt);
+    while_cnt++;
+
+    printf("JUMP &if_lim_end_%u\n", if_cnt);
+    printf("LABEL &if_lim_bad_%u\n", if_cnt);
+    printf("MOVE LF@%%retval_1 string@\n");
+    printf("LABEL &if_lim_end_%u\n", if_cnt);
+    if_cnt++;
+
+    printf("POPFRAME\n");
+    printf("RETURN\n");
+}
+
+void gen_ord(void)
+{
+    printf("# ord(string, integer): integer\n");
+    printf("LABEL &ord\n");
+    printf("PUSHFRAME\n");
+
+    printf("DEFVAR LF@$index\n");
+    printf("DEFVAR LF@%%retval_1\n");
+    printf("DEFVAR LF@$lim_cond\n");
+    printf("DEFVAR LF@$lim_cond_2\n");
+    printf("DEFVAR LF@$len\n");
+
+    printf("MOVE LF@%%retval_1 nil@nil\n");
+    printf("DEFVAR LF@$type\n");
+    printf("TYPE LF@$type LF@%%1\n");
+    printf("JUMPIFEQ &if_nil_%u LF@$type string@nil\n", if_cnt);
+    printf("TYPE LF@$type LF@%%2\n");
+    printf("JUMPIFEQ &if_nil_%u LF@$type string@nil\n", if_cnt);
+    printf("STRLEN LF@$len LF@%%1\n");
+    printf("LT LF@$lim_cond LF@%%2 int@1\n");
+    printf("GT LF@$lim_cond_2 LF@%%2 LF@$len\n");
+    printf("OR LF@$lim_cond LF@$lim_cond LF@$lim_cond_2\n");
+    printf("JUMPIFEQ &if_nil_%u LF@$lim_cond bool@true\n", if_cnt);
+    printf("SUB LF@$index LF@%%2 int@1\n");
+    printf("STRI2INT LF@%%retval_1 LF@%%1 LF@$index\n");
+    printf("LABEL &if_nil_%u\n", if_cnt);
+    if_cnt++;
+
+    printf("POPFRAME\n");
+    printf("RETURN\n");
+}
+
+void gen_chr(void)
+{
+    printf("# chr(integer): string\n");
+    printf("LABEL &chr\n");
+    printf("PUSHFRAME\n");
+
+    printf("DEFVAR LF@%%retval_1\n");
+    printf("DEFVAR LF@$lim_cond\n");
+    printf("DEFVAR LF@$lim_cond_2\n");
+    printf("DEFVAR LF@$type\n");
+
+    printf("MOVE LF@%%retval_1 nil@nil\n");
+    printf("TYPE LF@$type LF@%%1\n");
+    printf("JUMPIFNEQ &if_nil_%u LF@$type string@nil\n", if_cnt);
+    printf("EXIT int@8\n");
+    printf("LABEL &if_nil_%u\n", if_cnt);
+    if_cnt++;
+
+    printf("LT LF@$lim_cond LF@%%1 int@0\n");
+    printf("GT LF@$lim_cond_2 LF@%%1 int@255\n");
+    printf("OR LF@$lim_cond LF@$lim_cond LF@$lim_cond_2\n");
+    printf("JUMPIFEQ &if_lim_%u LF@$lim_cond bool@true\n", if_cnt);
+    printf("INT2CHAR LF@%%retval_1 LF@%%1\n");
+    printf("LABEL &if_lim_%u\n", if_cnt);
+    if_cnt++;
+
+    printf("POPFRAME\n");
+    printf("RETURN\n");
+}
+
 void gen_builtins(void)
 {
-    // TODO
+    // We need to separate code of built-in functions from the code for normal executing
+    printf("JUMP &builtins_skip\n\n");
+
+    // I/O operations
+    gen_reads();
+    printf("\n");
+    gen_readi();
+    printf("\n");
+    gen_readn();
+    printf("\n");
+    gen_write();
+    printf("\n");
+
+    // Conversions
+    gen_tointeger();
+    printf("\n");
+
+    // String operations
+    gen_substr();
+    printf("\n");
+    gen_ord();
+    printf("\n");
+    gen_chr();
+    printf("\n");
+
+    printf("LABEL &builtins_skip\n");
 }
 
 void gen_ifjcode21(void)
@@ -442,48 +677,30 @@ void gen_conv_to_number_subtop()
 void gen_write_identifier(identifier_t *id)
 {
     gen_create_frame();
-    printf("PUSHS LF@%s_%lu_%lu\n",
+    printf("DEFVAR TF@%%1\n");
+    printf("MOVE TF@%%1 LF@%s_%lu_%lu\n",
             id->name,
             id->line,
             id->character);
-    printf("DEFVAR TF@%%params\n");
-    printf("MOVE TF@%%params int@1\n");
     printf("CALL &write\n");
 }
 
 void gen_write_integer(int i)
 {
-    gen_create_frame();
-    printf("PUSHS int@%d\n", i);
-    printf("DEFVAR TF@%%params\n");
-    printf("MOVE TF@%%params int@1\n");
-    printf("CALL &write\n");
+    printf("WRITE int@%d\n", i);
 }
 
 void gen_write_number(double n)
 {
-    gen_create_frame();
-    printf("PUSHS float@%a\n", n);
-    printf("DEFVAR TF@%%params\n");
-    printf("MOVE TF@%%params int@1\n");
-    printf("CALL &write\n");
+    printf("WRITE float@%a\n", n);
 }
 
 void gen_write_string(char *s)
 {
-    gen_create_frame();
-    printf("PUSHS string@%s\n", s);
-    printf("DEFVAR TF@%%params\n");
-    printf("MOVE TF@%%params int@1\n");
-    printf("CALL &write\n");
+    printf("WRITE string@%s\n", s);
 }
 
-// TODO this call is redundant, but for the sake of consistency
 void gen_write_nil()
 {
-    gen_create_frame();
-    printf("PUSHS nil@nil\n");
-    printf("DEFVAR TF@%%params\n");
-    printf("MOVE TF@%%params int@1\n");
-    printf("CALL &write\n");
+    printf("WRITE string@nil\n");
 }
