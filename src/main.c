@@ -6,6 +6,7 @@
  * Team: 128 (variant II)
  *
  * @author Michal Šmahel (xsmahe01)
+ * @author Martin Havlík (xhavli56)
  */
 #include <stdio.h>
 
@@ -106,8 +107,6 @@ int main()
             LOG_ERROR_M("Popped remaining local symtable.");
         }
     }
-
-    // TODO free param and retval for id's in global symtable
 
     string_destroy(retval);
     string_destroy(param);

@@ -321,7 +321,7 @@ void gen_create_frame()
     return_assign_cnt = 1;
 }
 
-void gen_call_param(token_t *token)
+void gen_call_param(token_t *token, bool conv_to_number)
 {
     // when calling a function, prepare value for passing
     printf("DEFVAR TF@%%%u\n", call_param_cnt);
@@ -350,6 +350,11 @@ void gen_call_param(token_t *token)
                 call_param_cnt,
                 token->string);
     }
+
+    if (conv_to_number)
+        printf("INT2FLOAT TF@%%%u TF@%%%u\n",
+                call_param_cnt,
+                call_param_cnt);
 
     call_param_cnt++;
 }
