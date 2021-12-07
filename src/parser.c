@@ -124,6 +124,9 @@ static token_t term(token_t token, context_t *ctx)
     LOG_DEBUG_M();
     debug_token(token);
     debug_identifier(ctx->saved_id);
+    int param_index;
+    bool implicit_conv = false;
+    enum variable_type converted;
 
     if (token.type == IDENTIFIER) {
         if (!is_valid_variable(ctx, &token)) {
@@ -131,27 +134,54 @@ static token_t term(token_t token, context_t *ctx)
             exit(EDEF);
         }
 
+        converted = token.identifier->var.type;
+
+        if (token.identifier->var.type == VAR_INTEGER) {
+            param_index = strlen(string_expose(ctx->param));
+            if (ctx->saved_id->fun.param[param_index] == VAR_NUMBER) {
+                LOG_DEBUG("will do implicit conv for variable '%s'",
+                        token.identifier->name);
+                implicit_conv = true;
+                // TODO do not rewrite it like this because we would generate
+                // number when really the value is integer
+                //token.identifier->var.type = VAR_NUMBER;
+                converted = VAR_NUMBER;
+            }
+        }
+
         LOG_DEBUG_M("id ok");
-        debug_token(token);
-        string_appendc(ctx->param, token.identifier->var.type);
+        debug_identifier(token.identifier);
+        string_appendc(ctx->param, converted);
 
         if (!strcmp(ctx->saved_id->fun.param, "write")) {
             gen_write_identifier(token.identifier);
         } else {
-            gen_call_param(&token);
+            gen_call_param(&token, implicit_conv);
         }
+
 
         token = get_next_token(ctx);
         return token;
 
     } else if (token.type == INTEGER) {
         LOG_DEBUG_M("TYPE integer ok");
-        string_appendc(ctx->param, VAR_INTEGER);
+        // TODO implicit conv to number
+
+        param_index = strlen(string_expose(ctx->param));
+        if (ctx->saved_id->fun.param[param_index] == VAR_NUMBER) {
+                LOG_DEBUG("will do implicit conv for integer term '%d'",
+                        token.integer);
+                implicit_conv = true;
+                //token.type = NUMBER;
+                string_appendc(ctx->param, VAR_NUMBER);
+        } else {
+            string_appendc(ctx->param, VAR_INTEGER);
+        }
 
         if (!strcmp(ctx->saved_id->fun.param, "write")) {
             gen_write_integer(token.integer);
         } else {
-            gen_call_param(&token);
+            gen_call_param(&token, implicit_conv);
         }
 
         token = get_next_token(ctx);
@@ -164,7 +194,7 @@ static token_t term(token_t token, context_t *ctx)
         if (!strcmp(ctx->saved_id->fun.param, "write")) {
             gen_write_number(token.number);
         } else {
-            gen_call_param(&token);
+            gen_call_param(&token, false);
         }
 
         token = get_next_token(ctx);
@@ -177,7 +207,7 @@ static token_t term(token_t token, context_t *ctx)
         if (!strcmp(ctx->saved_id->fun.param, "write")) {
             gen_write_string(token.string);
         } else {
-            gen_call_param(&token);
+            gen_call_param(&token, false);
         }
         // is string not used after this?
         // code using it is generated, so I think
@@ -711,6 +741,8 @@ static token_t e_list(token_t token, context_t *ctx)
 {
     LOG_DEBUG_M();
     debug_token(token);
+    enum variable_type expr_type;
+    int param_index;
 
     token = get_next_token(ctx);
     if (token.type == KEYWORD) {
@@ -720,9 +752,23 @@ static token_t e_list(token_t token, context_t *ctx)
     }
     unget_token(token);
 
-    enum variable_type expr_type;
     expr_type = expr_parser_start(ctx);
     LOG_DEBUG("expr is '%c'", expr_type);
+
+    param_index = strlen(string_expose(ctx->retval));
+    LOG_DEBUG("e_list() after first expr, retval '%s' len: %d",
+            string_expose(ctx->retval),
+            param_index);
+
+    // conv if corresponding LHS type is number and we are integer
+    if (string_expose(ctx->param)[param_index] == VAR_NUMBER &&
+            expr_type == VAR_INTEGER) {
+        LOG_DEBUG_M("will do implicit conv for expr result");
+        gen_conv_to_number_top();
+        expr_type = VAR_NUMBER;
+    }
+
+
     string_appendc(ctx->retval, expr_type);
     LOG_DEBUG_M("e_list: saved_id:");
     debug_identifier(ctx->saved_id);
@@ -867,6 +913,7 @@ static token_t stmt(token_t token, context_t *ctx)
     LOG_DEBUG_M();
     debug_token(token);
     char *saved_LHS;
+    identifier_t *backup;
 
     if (token.type == IDENTIFIER) {
         LOG_DEBUG_M("id diving");
@@ -876,7 +923,7 @@ static token_t stmt(token_t token, context_t *ctx)
         LOG_DEBUG("id_seq() returned LSH: '%s'\n",
                 string_expose(ctx->param));
         saved_LHS = string_export(ctx->param);
-        string_clear(ctx->param);
+
 
         token = get_next_token(ctx);
 
@@ -888,6 +935,9 @@ static token_t stmt(token_t token, context_t *ctx)
         debug_token(token);
 
         if (token.type == IDENTIFIER) {
+            // TODO moved string_clear into this if,
+            // before it was above it
+            string_clear(ctx->param);
             identifier_t *fun_id = symtable_find(symstack_global_symtable(ctx->symstack),
                                                 token.identifier->name);
             if (fun_id) {
@@ -904,7 +954,10 @@ static token_t stmt(token_t token, context_t *ctx)
                 LOG_DEBUG("ok, we can call %s()", fun_id->name);
 
                 token.identifier = fun_id;
+                backup = ctx->saved_id;
+                ctx->saved_id = fun_id;
                 token = call(token, ctx);
+                ctx->saved_id = backup;
 
                 for (int i = 0; i < (int)strlen(saved_LHS); i++)
                     gen_returned_assign(ctx->symqueue);
