@@ -48,7 +48,10 @@ void gen_fun_param(identifier_t *id);
 
 void gen_create_frame();
 
-void gen_call_param(token_t *token);
+/**
+ * @param conv_to_number If implicit conv should be generated for the param.
+ */
+void gen_call_param(token_t *token, bool conv_to_number);
 
 void gen_call(identifier_t *id);
 
