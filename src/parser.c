@@ -130,12 +130,7 @@ static token_t term(token_t token, context_t *ctx)
             LOG_ERROR("%s is not an existing variable", token.identifier->name);
             exit(EDEF);
         }
-#if 0
-        if (token.identifier->type != VARIABLE) {
-            LOG_ERROR("%s is not an existing variable", token.identifier->name);
-            exit(EDEF);
-        }
-#endif
+
         LOG_DEBUG_M("id ok");
         debug_token(token);
         string_appendc(ctx->param, token.identifier->var.type);
@@ -184,6 +179,10 @@ static token_t term(token_t token, context_t *ctx)
         } else {
             gen_call_param(&token);
         }
+        // is string not used after this?
+        // code using it is generated, so I think
+        // we can free it
+        free(token.string);
 
         token = get_next_token(ctx);
         return token;
@@ -293,6 +292,7 @@ static token_t call(token_t token, context_t *ctx)
             LOG_DEBUG_M("( ok");
 
             token = get_next_token(ctx);
+            debug_token(token);
 
             // TODO again implicit conv integer->number
             token = term_seq(token, ctx);
@@ -342,6 +342,7 @@ static token_t type(token_t token, context_t *ctx)
             LOG_DEBUG_M("integer ok");
             if (ctx->saved_id->type == VARIABLE) {
                 ctx->saved_id->var.type = VAR_INTEGER;
+                LOG_DEBUG("var '%s' set to integer", ctx->saved_id->name);
             }
             token = get_next_token(ctx);
             return token;
@@ -901,8 +902,7 @@ static token_t stmt(token_t token, context_t *ctx)
                     exit(EFUNCALL);
                 }
                 LOG_DEBUG("ok, we can call %s()", fun_id->name);
-                // TODO am I not leaking something rewriting the identifier?
-                // same in var_assign()
+
                 token.identifier = fun_id;
                 token = call(token, ctx);
 
@@ -954,10 +954,10 @@ static token_t var_assign(token_t token, context_t *ctx)
     char *saved_LHS;
 
     if (token.type == ASSIGNMENT) {
+        saved_LHS = string_export(ctx->param);
         token = get_next_token(ctx);
 
         if (token.type == IDENTIFIER) {
-            saved_LHS = string_export(ctx->param);
             string_clear(ctx->param);
             identifier_t *fun_id = symtable_find(symstack_global_symtable(ctx->symstack),
                                                 token.identifier->name);
@@ -975,31 +975,35 @@ static token_t var_assign(token_t token, context_t *ctx)
 
                 gen_returned_assign(ctx->symqueue);
                 assert(symqueue_is_empty(ctx->symqueue));
+                free(saved_LHS);
 
                 return token;
             }
         }
         // RHS is single expression
+        // TODO saved_LHS doesn't work
 
         unget_token(token);
         LOG_DEBUG_M("...expression code");
         expr_type = expr_parser_start(ctx);
 
-        LOG_DEBUG("var_assing after expr: param '%s' expr_type '%c'",
-                string_expose(ctx->param), expr_type);
-        if (string_expose(ctx->param)[0] == 'n' && expr_type == 'i') {
+        LOG_DEBUG("var_assing after expr: LHS '%s' expr_type '%c'",
+                saved_LHS, expr_type);
+        if (saved_LHS[0] == 'n' && expr_type == 'i') {
             gen_conv_to_number_top();
             expr_type = 'n';
         }
 
         snprintf(expr_type_string, 2, "%c", expr_type);
-        if (strcmp(string_expose(ctx->param), expr_type_string)) {
+        if (strcmp(saved_LHS, expr_type_string)) {
             LOG_ERROR("expr type '%s' doesn't match variable type '%s'",
-                    expr_type_string, string_expose(ctx->param));
+                    expr_type_string, saved_LHS);
             exit(EASSIGN);
         }
         // generate
         gen_var_dec_assign(ctx->symqueue, true);
+        free(saved_LHS);
+
         return token;
 
     } else if (token.type == IDENTIFIER) {
@@ -1108,6 +1112,8 @@ static token_t var_dec_def(token_t token, context_t *ctx)
         if (*token.keyword == KW_LOCAL) {
             LOG_DEBUG_M("local diving");
             token = var_dec(token, ctx);
+            LOG_DEBUG("param after var_dec(): '%s'",
+                    string_expose(ctx->param));
             token = var_assign(token, ctx);
             string_clear(ctx->param);
             return token;
@@ -1132,7 +1138,7 @@ static token_t body_1(token_t token, context_t *ctx)
         identifier_t *fun_id = symtable_find(symstack_global_symtable(ctx->symstack),
                                             token.identifier->name);
         if (fun_id) {
-            // TODO handle write()
+            // write() handled by swapping saved_id
             // call, but there is no LHS
             token.identifier = fun_id;
             body_id = ctx->saved_id;
@@ -1461,18 +1467,21 @@ static token_t param(token_t token, context_t *ctx)
                     token = type(token, ctx);
                     string_appendc(ctx->param, VAR_INTEGER);
                     saved_id->var.type = VAR_INTEGER;
+                    LOG_DEBUG("var '%s' set to integer", saved_id->name);
                     return token;
                 } else if (*token.keyword == KW_NUMBER) {
                     LOG_DEBUG_M("number diving");
                     token = type(token, ctx);
                     string_appendc(ctx->param, VAR_NUMBER);
                     saved_id->var.type = VAR_NUMBER;
+                    LOG_DEBUG("var '%s' set to number", saved_id->name);
                     return token;
                 } else if (*token.keyword == KW_STRING) {
                     LOG_DEBUG_M("string diving");
                     token = type(token, ctx);
                     string_appendc(ctx->param, VAR_STRING);
                     saved_id->var.type = VAR_STRING;
+                    LOG_DEBUG("var '%s' set to string", saved_id->name);
                     return token;
                 }
             }
