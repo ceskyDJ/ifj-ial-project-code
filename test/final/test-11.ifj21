@@ -1,0 +1,17 @@
+require "ifj21"
+
+function sum(a:integer, b:integer):number
+    return a + b
+end
+
+function main()
+    write("Enter an integer: \n")
+    local x : integer = readi()
+    write("Enter a number: \n")
+    local y : number = readn()
+    local z : integer = tointeger(y)
+
+    local res : number = sum(x, z)
+    write("Sum is ", res, "\n")
+end
+main()
