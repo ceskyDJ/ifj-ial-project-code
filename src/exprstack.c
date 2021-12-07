@@ -36,7 +36,7 @@ static bool token_equal(token_t first, token_t second)
     if (first.type != second.type)
         return false;
 
-    if (first.type == KEYWORD && first.keyword != second.keyword)
+    if (first.type == KEYWORD && *first.keyword != *second.keyword)
         return false;
 
     return true;
