@@ -11,7 +11,7 @@
 #include "context.h"
 #include "exit_codes.h"
 #include "kwtable.h"
-#define LOG_LEVEL ERROR
+#define LOG_LEVEL DEBUG
 #include "logger.h"
 #include "scanner.h"
 #include "string_factory.h"
@@ -673,19 +673,34 @@ static token_t e_1(token_t token, context_t *ctx)
     LOG_DEBUG_M();
     debug_token(token);
     enum variable_type expr_type;
+    int retval_index;
 
     if (token.type == COMMA) {
         LOG_DEBUG_M(", ok");
 
-        expr_type = expr_parser_start(ctx);
-        LOG_DEBUG("expr is '%c'", expr_type);
-        string_appendc(ctx->retval, expr_type);
-
-        // TODO on each expression, if integer and param is number
-        // do implicit conv
-
         LOG_DEBUG_M("e_1() saved_id is");
         debug_identifier(ctx->saved_id);
+
+        expr_type = expr_parser_start(ctx);
+        LOG_DEBUG("expr is '%c'", expr_type);
+
+        // TODO the implicit conv MUST work for both functions
+        // and expression lists
+
+        retval_index = strlen(string_expose(ctx->retval));
+        LOG_DEBUG("e_1() retval_index: %d, expr: %c, retval: '%s'",
+                retval_index,
+                expr_type,
+                string_expose(ctx->retval));
+
+        if (ctx->saved_id->fun.retval[retval_index] == VAR_NUMBER &&
+                expr_type == VAR_INTEGER) {
+            LOG_DEBUG_M("will do implicit conv for expr result");
+            gen_conv_to_number_top();
+            expr_type = VAR_NUMBER;
+        }
+
+        string_appendc(ctx->retval, expr_type);
 
         gen_var_active_assign(ctx->symqueue, true);
 
@@ -742,7 +757,7 @@ static token_t e_list(token_t token, context_t *ctx)
     LOG_DEBUG_M();
     debug_token(token);
     enum variable_type expr_type;
-    int param_index;
+    int retval_index;
 
     token = get_next_token(ctx);
     if (token.type == KEYWORD) {
@@ -755,13 +770,13 @@ static token_t e_list(token_t token, context_t *ctx)
     expr_type = expr_parser_start(ctx);
     LOG_DEBUG("expr is '%c'", expr_type);
 
-    param_index = strlen(string_expose(ctx->retval));
+    retval_index = strlen(string_expose(ctx->retval));
     LOG_DEBUG("e_list() after first expr, retval '%s' len: %d",
             string_expose(ctx->retval),
-            param_index);
+            retval_index);
 
     // conv if corresponding LHS type is number and we are integer
-    if (string_expose(ctx->param)[param_index] == VAR_NUMBER &&
+    if (ctx->saved_id->fun.retval[retval_index] == VAR_NUMBER &&
             expr_type == VAR_INTEGER) {
         LOG_DEBUG_M("will do implicit conv for expr result");
         gen_conv_to_number_top();
@@ -935,12 +950,11 @@ static token_t stmt(token_t token, context_t *ctx)
         debug_token(token);
 
         if (token.type == IDENTIFIER) {
-            // TODO moved string_clear into this if,
-            // before it was above it
             string_clear(ctx->param);
             identifier_t *fun_id = symtable_find(symstack_global_symtable(ctx->symstack),
                                                 token.identifier->name);
             if (fun_id) {
+                // TODO if there integer on LHS but function returns number, implicit conv
                 // check LHS (saved in ctx->param) is prefix of function's retval
                 LOG_DEBUG("LHS '%s' (ctx->param '%s') %s() retval '%s'",
                         saved_LHS, string_expose(ctx->param), fun_id->name, fun_id->fun.retval);
@@ -972,7 +986,20 @@ static token_t stmt(token_t token, context_t *ctx)
         // RHS is expression list
         unget_token(token);
 
+        // make fake identifier and save it in context for e_list()
+        // so it thinks we are in a function that returns our LHS
+        backup = ctx->saved_id;
+        identifier_t fake_fun = {
+            .type = FUNCTION,
+            .name = "$fake_fun_LHS$",
+            .fun = {
+                .retval = saved_LHS,
+            },
+        };
+        ctx->saved_id = &fake_fun;
+
         token = e_list(token, ctx);
+        ctx->saved_id = backup;
 
         LOG_DEBUG("stmt analyzed: '%s' = '%s'",
                 saved_LHS,
