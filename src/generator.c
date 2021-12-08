@@ -422,8 +422,6 @@ void gen_var_dec_assign(symqueue_t *queue, bool value_on_stack)
     }
     if (value_on_stack) {
         // expr/call result is on stack
-        // TODO what if function returned multiple values?
-        // CLEARS after this?
         printf("POPS LF@%s_%lu_%lu\n",
                 var->name,
                 var->line,
