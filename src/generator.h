@@ -89,11 +89,11 @@ void gen_if_else(unsigned int if_cnt);
 void gen_if_end(unsigned int if_cnt);
 
 // TODO in while we want skipping DEFVARs, implement it
-void gen_while_start_before_expr(void);
+unsigned int gen_while_start_before_expr(void);
 
-void gen_while_start_after_expr(void);
+void gen_while_start_after_expr(unsigned int counter);
 
-void gen_while_end(void);
+void gen_while_end(unsigned int counter);
 
 /**
  * Runtime nil check for term TOP on stack.

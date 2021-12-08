@@ -1469,17 +1469,18 @@ static token_t while_(token_t token, context_t *ctx)
 
     symtable_t *local_symtable = symtable_create();
     symtable_t *popped;
+    unsigned int while_cnt;
 
     if (token.type == KEYWORD) {
         if (*token.keyword == KW_WHILE) {
             LOG_DEBUG_M("while ok");
 
-            gen_while_start_before_expr();
+            while_cnt = gen_while_start_before_expr();
 
             // generates code for expression at top of the stack
             expr_parser_start(ctx);
 
-            gen_while_start_after_expr();
+            gen_while_start_after_expr(while_cnt);
 
             token = get_next_token(ctx);
             if (token.type != KEYWORD)
@@ -1510,7 +1511,7 @@ static token_t while_(token_t token, context_t *ctx)
                 exit(ESYNTAX);
             LOG_DEBUG_M("end ok");
 
-            gen_while_end();
+            gen_while_end(while_cnt);
 
             return token;
         }
