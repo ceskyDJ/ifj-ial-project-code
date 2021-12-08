@@ -57,7 +57,7 @@ void gen_call(identifier_t *id);
 
 void gen_returned_assign(symqueue_t *queue, bool conv_to_number);
 
-void gen_var_dec(identifier_t *id, symqueue_t *queue);
+void gen_var_dec(identifier_t *id, symqueue_t *main_queue, symqueue_t *cycle_queue);
 
 void gen_var_dec_assign(symqueue_t *queue, bool value_on_stack);
 
@@ -67,7 +67,7 @@ void gen_var_active_assign(symqueue_t *queue, bool value_on_stack);
 
 void gen_var_retval(void);
 
-void gen_fun_end(identifier_t *id);
+void gen_fun_end(identifier_t *id, symqueue_t *cycle_queue);
 
 /**
  * Pushes term (id/integer/number/string/nil) to stack.
@@ -84,9 +84,9 @@ void gen_operation(enum token_type type);
  */
 unsigned int gen_if_start(void);
 
-void gen_if_else(unsigned int if_cnt);
+void gen_if_else(unsigned int if_cnt_local);
 
-void gen_if_end(unsigned int if_cnt);
+void gen_if_end(unsigned int if_cnt_local);
 
 // TODO in while we want skipping DEFVARs, implement it
 unsigned int gen_while_start_before_expr(void);

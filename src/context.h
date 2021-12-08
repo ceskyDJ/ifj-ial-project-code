@@ -33,7 +33,8 @@ typedef struct context {
     identifier_t *saved_id;
     string_t *param;
     string_t *retval;
-    symqueue_t *symqueue;
+    symqueue_t *main_symqueue;
+    symqueue_t *cycle_symqueue;
 } context_t;
 
 #endif // _CONTEXT_H_

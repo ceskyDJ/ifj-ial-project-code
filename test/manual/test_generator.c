@@ -10,7 +10,8 @@ int main() {
     token_t token;
     identifier_t id;
     identifier_t tmp;
-    symqueue_t *queue= symqueue_create();
+    symqueue_t *main_queue = symqueue_create();
+    symqueue_t *cycle_queue = symqueue_create();
     kwtable_t *kw = kwtable_create();
 
     printf("#-----GEN_IFJCODE21-----\n");
@@ -41,64 +42,64 @@ int main() {
     printf("\n#-----GEN_CALL_PARAM-----\n");
     token.type = IDENTIFIER;
     token.identifier = &id;
-    gen_call_param(&token);
+    gen_call_param(&token, cycle_queue);
 
     token.type = INTEGER;
     token.integer = 13;
-    gen_call_param(&token);
+    gen_call_param(&token, cycle_queue);
 
     token.type = STRING;
     token.string = "call_param_string";
-    gen_call_param(&token);
+    gen_call_param(&token, cycle_queue);
 
     printf("\n#-----GEN_VAR_DEC-----\n");
     id.name = "z";
     id.line = 27;
     id.character = 22;
-    gen_var_dec(&id, queue);
-    printf("[symqueue %s\n", symqueue_is_empty(queue) ? "is empty]" : "is NOT empty]");
+    gen_var_dec(&id, main_queue, cycle_queue);
+    printf("[symqueue %s\n", symqueue_is_empty(main_queue) ? "is empty]" : "is NOT empty]");
 
     printf("\n#-----GEN_VAR_DEC_ASSIGN-----\n");
-    gen_var_dec_assign(queue, true);
-    printf("[symqueue %s\n", symqueue_is_empty(queue) ? "is empty]" : "is NOT empty]");
+    gen_var_dec_assign(main_queue, true);
+    printf("[symqueue %s\n", symqueue_is_empty(main_queue) ? "is empty]" : "is NOT empty]");
 
     printf("\n#-----GEN_VAR_SET_ACTIVE-----\n");
     id.name = "trie";
     id.line = 43;
     id.character = 1;
-    gen_var_set_active(&id, queue);
-    printf("[symqueue %s\n", symqueue_is_empty(queue) ? "is empty]" : "is NOT empty]");
+    gen_var_set_active(&id, main_queue);
+    printf("[symqueue %s\n", symqueue_is_empty(main_queue) ? "is empty]" : "is NOT empty]");
 
     tmp.name = "%retval_1";
     tmp.line = 0;
     tmp.character = 0;
-    gen_var_set_active(&tmp, queue);
-    printf("[symqueue %s\n", symqueue_is_empty(queue) ? "is empty]" : "is NOT empty]");
+    gen_var_set_active(&tmp, main_queue);
+    printf("[symqueue %s\n", symqueue_is_empty(main_queue) ? "is empty]" : "is NOT empty]");
 
     printf("\n#-----GEN_VAR_ACTIVE_ASSIGN-----\n");
-    gen_var_active_assign(queue, true);
-    printf("[symqueue %s\n", symqueue_is_empty(queue) ? "is empty]" : "is NOT empty]");
+    gen_var_active_assign(main_queue, true);
+    printf("[symqueue %s\n", symqueue_is_empty(main_queue) ? "is empty]" : "is NOT empty]");
 
     printf("\n");
 
-    gen_var_active_assign(queue, true);
-    printf("[symqueue %s\n", symqueue_is_empty(queue) ? "is empty]" : "is NOT empty]");
+    gen_var_active_assign(main_queue, true);
+    printf("[symqueue %s\n", symqueue_is_empty(main_queue) ? "is empty]" : "is NOT empty]");
 
-    gen_var_active_assign(queue, false);
-    printf("[symqueue %s\n", symqueue_is_empty(queue) ? "is empty]" : "is NOT empty]");
+    gen_var_active_assign(main_queue, false);
+    printf("[symqueue %s\n", symqueue_is_empty(main_queue) ? "is empty]" : "is NOT empty]");
 
     printf("\n#-----GEN_RETURNED_ASSIGN-----\n");
     id.name = "trie";
     id.line = 43;
     id.character = 1;
-    gen_var_set_active(&id, queue);
+    gen_var_set_active(&id, main_queue);
     tmp.name = "foo";
     tmp.line = 2;
     tmp.character = 3;
-    gen_var_set_active(&tmp, queue);
+    gen_var_set_active(&tmp, main_queue);
 
-    gen_returned_assign(queue);
-    gen_returned_assign(queue);
+    gen_returned_assign(main_queue);
+    gen_returned_assign(main_queue);
 
 
     printf("\n#-----GEN_VAR_RETVAL-----\n");
@@ -110,7 +111,7 @@ int main() {
 
     printf("\n#-----GEN_FUN_END-----\n");
     id.name = "foo";
-    gen_fun_end(&id);
+    gen_fun_end(&id, cycle_queue);
 
     printf("\n#-----GEN_PUSH_TERM-----\n");
     token.type = INTEGER;
