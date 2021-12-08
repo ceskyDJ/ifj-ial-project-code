@@ -179,4 +179,4 @@ archive:
 clean:
 	rm -f *.c~ *.h~
 cleanall: clean
-	rm -f $(BIN_P)/* $(DEP_P)/* $(OBJ_P)/* $(RES_P)/* $(RUN_P)/* ../xsmahe01.tar.gz
+	rm -f $(BIN_P)/* $(DEP_P)/* $(OBJ_P)/* $(RES_P)/* $(RUN_P)/* ../xsmahe01.tgz

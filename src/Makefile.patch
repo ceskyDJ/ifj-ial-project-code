@@ -1,5 +1,5 @@
---- Makefile.std	2021-11-27 23:42:24.613295119 +0100
-+++ Makefile	2021-11-27 23:58:06.516804659 +0100
+--- Makefile.std	2021-12-08 23:54:15.170442875 +0100
++++ Makefile	2021-12-08 23:55:21.882944494 +0100
 @@ -10,173 +10,53 @@
  
  # Usage:
@@ -183,8 +183,8 @@
  # Cleaning stuff
  clean:
 -	rm -f *.c~ *.h~
-+	rm -f *.o *.c~ *.h~ xsmahe01.tar.gz
++	rm -f *.o *.c~ *.h~ xsmahe01.tgz
 +
  cleanall: clean
--	rm -f $(BIN_P)/* $(DEP_P)/* $(OBJ_P)/* $(RES_P)/* $(RUN_P)/* ../xsmahe01.tar.gz
+-	rm -f $(BIN_P)/* $(DEP_P)/* $(OBJ_P)/* $(RES_P)/* $(RUN_P)/* ../xsmahe01.tgz
 +	rm -f $(BINARY_NAME) dep-src.list

@@ -41,7 +41,7 @@ jobs:
         run: cd test/basics; patch is_it_ok.sh is_it_ok.sh.patch
 
       - name: Run test script
-        run: ./test/basics/is_it_ok.sh xsmahe01.tar.gz ./tmp
+        run: ./test/basics/is_it_ok.sh xsmahe01.tgz ./tmp
 
   # Check rules from assignment not tested by the official script
   other-assignment-rules:
@@ -68,7 +68,7 @@ jobs:
         run: mkdir tmp
 
       - name: Extract the archive to the previously prepared directory
-        run: cd tmp; tar -xzvf ../xsmahe01.tar.gz
+        run: cd tmp; tar -xzvf ../xsmahe01.tgz
 
       - name: Run own tests
         run: ./test/basics/other-assignment-rules.sh

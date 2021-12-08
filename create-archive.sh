@@ -58,7 +58,7 @@ patch -p0 < Makefile.patch
 rm Makefile.patch
 
 # Create archive
-tar -czvf ../xsmahe01.tar.gz *
+tar -czvf ../xsmahe01.tgz *
 
 # Go to project root
 cd ../ || exit 1
