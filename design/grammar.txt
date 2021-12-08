@@ -82,7 +82,7 @@ starting non-terminal: PROG
 55: VAR_ASSIGN ::= = e
 56: VAR_ASSIGN ::= ''
 
-57: STMT ::= ID_SEQ = E_LIST
+57: STMT ::= ID_SEQ = E_LIST/CALL
 58: ID_SEQ ::= id ID_SEQ'
 59: ID_SEQ' ::= , id ID_SEQ'
 60: ID_SEQ' ::= ''
