@@ -939,6 +939,10 @@ static token_t stmt(token_t token, context_t *ctx)
                 string_expose(ctx->param));
         saved_LHS = string_export(ctx->param);
 
+        int saved_LHS_len = strlen(saved_LHS);
+        bool conv_returned[saved_LHS_len];
+        for (int i = 0; i < saved_LHS_len; i++)
+            conv_returned[i] = false;
 
         token = get_next_token(ctx);
 
@@ -954,16 +958,30 @@ static token_t stmt(token_t token, context_t *ctx)
             identifier_t *fun_id = symtable_find(symstack_global_symtable(ctx->symstack),
                                                 token.identifier->name);
             if (fun_id) {
-                // TODO if there integer on LHS but function returns number, implicit conv
+                if ((int)strlen(fun_id->fun.retval) < saved_LHS_len) {
+                    LOG_ERROR("%s():'%s' does not return enough values to fill LHS '%s'",
+                            fun_id->name,
+                            fun_id->fun.retval,
+                            saved_LHS);
+                    exit(EFUNCALL);
+                }
                 // check LHS (saved in ctx->param) is prefix of function's retval
                 LOG_DEBUG("LHS '%s' (ctx->param '%s') %s() retval '%s'",
                         saved_LHS, string_expose(ctx->param), fun_id->name, fun_id->fun.retval);
-                if (strncmp(saved_LHS, fun_id->fun.retval, strlen(saved_LHS))) {
-                    LOG_ERROR("LHS '%s' is not compatible with %s() return values '%s'",
-                            saved_LHS,
-                            fun_id->name,
-                            fun_id->fun.retval);
-                    exit(EFUNCALL);
+
+                for (int i = 0; i < saved_LHS_len; i++) {
+                    if (saved_LHS[i] == VAR_NUMBER && fun_id->fun.retval[i] == VAR_INTEGER) {
+                        conv_returned[i] = true;
+                        LOG_DEBUG("will apply implicit conv at index %d", i);
+                    } else if (saved_LHS[i] == fun_id->fun.retval[i]) {
+                        continue;
+                    } else {
+                        LOG_ERROR("LHS '%s' is not compatible with %s() return values '%s'",
+                                saved_LHS,
+                                fun_id->name,
+                                fun_id->fun.retval);
+                        exit(EFUNCALL);
+                    }
                 }
                 LOG_DEBUG("ok, we can call %s()", fun_id->name);
 
@@ -973,8 +991,9 @@ static token_t stmt(token_t token, context_t *ctx)
                 token = call(token, ctx);
                 ctx->saved_id = backup;
 
-                for (int i = 0; i < (int)strlen(saved_LHS); i++)
-                    gen_returned_assign(ctx->symqueue);
+                for (int i = 0; i < saved_LHS_len; i++) {
+                    gen_returned_assign(ctx->symqueue, conv_returned[i]);
+                }
 
                 assert(symqueue_is_empty(ctx->symqueue));
                 free(saved_LHS);
@@ -1053,7 +1072,8 @@ static token_t var_assign(token_t token, context_t *ctx)
                 token.identifier = fun_id;
                 token = call(token, ctx);
 
-                gen_returned_assign(ctx->symqueue);
+                // TODO no implicit conv here, right?
+                gen_returned_assign(ctx->symqueue, false);
                 assert(symqueue_is_empty(ctx->symqueue));
                 free(saved_LHS);
 
