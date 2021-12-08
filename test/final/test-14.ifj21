@@ -1,0 +1,14 @@
+ -- Program 14: funkce chr() 
+require "ifj21"
+function main()
+  local x : string
+  local y : string
+
+  x = chr(88) -- X
+  y = chr(121) -- y
+
+  write(x, "\044" , y)
+
+end
+main() 
+
