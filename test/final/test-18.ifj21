@@ -1,0 +1,9 @@
+ -- Program 18: parametr nil ve funkci chr() - chyba 8 
+require "ifj21"
+function main()
+  local x : string
+  local y : integer
+
+  x = chr(y)
+end
+main()
