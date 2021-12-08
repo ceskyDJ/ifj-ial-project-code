@@ -31,7 +31,6 @@ static void print_function_signature(identifier_t *id)
 static unsigned int fun_param_cnt = 1;
 static unsigned int call_param_cnt = 1;
 static unsigned int retval_cnt = 1;
-static unsigned int var_cnt = 1;
 static unsigned int if_cnt = 1;
 static unsigned int while_cnt = 1;
 static unsigned int nil_check_cnt = 1;
@@ -549,11 +548,10 @@ unsigned int gen_if_start()
 
     // expects expression result (even non bool) at the top of the stack
     printf("# IF <expr> THEN ...\n");
-    printf("DEFVAR LF@$if_expr_%u\n", var_cnt);
-    printf("POPS LF@$if_expr_%u\n", var_cnt);
-    printf("PUSHS LF@$if_expr_%u\n", var_cnt);
-    printf("TYPE LF@$if_expr_%u LF@$if_expr_%u\n", var_cnt, var_cnt);
-    printf("JUMPIFNEQ &if_expr_not_bool_%u LF@$if_expr_%u string@bool\n", if_cnt, var_cnt);
+    printf("POPS LF@$op_tmp_1\n");
+    printf("PUSHS LF@$op_tmp_1\n");
+    printf("TYPE LF@$op_tmp_1 LF@$op_tmp_1\n");
+    printf("JUMPIFNEQ &if_expr_not_bool_%u LF@$op_tmp_1 string@bool\n", if_cnt);
     printf("# expr is bool and is on top of the stack\n");
     printf("PUSHS bool@false\n");
     printf("JUMPIFEQS &else_%u\n", if_cnt);
@@ -561,11 +559,9 @@ unsigned int gen_if_start()
     printf("LABEL &if_expr_not_bool_%u\n", if_cnt);
     // anything other than `nil` is considered true
     printf("# expr is NOT bool\n");
-    printf("JUMPIFEQ &else_%u LF@$if_expr_%u string@nil\n", if_cnt, var_cnt);
+    printf("JUMPIFEQ &else_%u LF@$op_tmp_1 string@nil\n", if_cnt);
     printf("LABEL &then_%u\n", if_cnt);
     printf("# code for THEN follows...\n");
-
-    var_cnt++;
 
     return if_cnt;
 }
@@ -586,7 +582,6 @@ void gen_if_end(unsigned int if_cnt)
 void gen_while_start_before_expr()
 {
     printf("# WHILE EXPR DO ...\n");
-    printf("DEFVAR LF@$while_expr_%u\n", var_cnt);
     printf("LABEL &while_%u\n", while_cnt);
     printf("# code for EXPR follows...\n");
 }
@@ -594,10 +589,10 @@ void gen_while_start_before_expr()
 void gen_while_start_after_expr()
 {
     printf("# expression result ready on top of the stack\n");
-    printf("POPS LF@$while_expr_%u\n", var_cnt);
-    printf("PUSHS LF@$while_expr_%u\n", var_cnt);
-    printf("TYPE LF@$while_expr_%u LF@$while_expr_%u\n", var_cnt, var_cnt);
-    printf("JUMPIFNEQ &while_expr_not_bool_%u LF@$while_expr_%u string@bool\n", while_cnt, var_cnt);
+    printf("POPS LF@$op_tmp_1\n");
+    printf("PUSHS LF@$op_tmp_1\n");
+    printf("TYPE LF@$op_tmp_1 LF@$op_tmp_1\n");
+    printf("JUMPIFNEQ &while_expr_not_bool_%u LF@$op_tmp_1 string@bool\n", while_cnt);
     printf("# expr is bool and is on top of the stack\n");
     printf("PUSHS bool@false\n");
     printf("JUMPIFEQS &while_end_%u\n", while_cnt);
@@ -605,11 +600,9 @@ void gen_while_start_after_expr()
     printf("LABEL &while_expr_not_bool_%u\n", while_cnt);
     // anything other than `nil` is considered true
     printf("# expr is NOT bool\n");
-    printf("JUMPIFEQ &while_end_%u LF@$while_expr_%u string@nil\n", while_cnt, var_cnt);
+    printf("JUMPIFEQ &while_end_%u LF@$op_tmp_1 string@nil\n", while_cnt);
     printf("LABEL &while_do_%u\n", while_cnt);
     printf("# code for DO follows\n");
-
-    var_cnt++;
 }    
 
 void gen_while_end()
