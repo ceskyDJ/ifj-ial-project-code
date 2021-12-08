@@ -1,15 +1,18 @@
 /**
  * @file identifier.h
- * Identifier structure.
+ * Header file of identifier
  *
  * IFJ and IAL project (IFJ21 compiler)
  * Team: 128 (variant II)
  *
  * @author Martin Havlík (xhavli56)
+ * @author Michal Šmahel (xsmahe01)
  */
 
 #ifndef _IDENTIFIER_H_
 #define _IDENTIFIER_H_
+
+#include <stdbool.h>
 
 enum variable_type {
     VAR_INTEGER='i', VAR_NUMBER='n', VAR_STRING='s', VAR_BOOL='b'
@@ -41,6 +44,19 @@ typedef struct identifier {
         } fun;
     };
 } identifier_t;
+
+/**
+ * Create a deep copy of identifier
+ *
+ * @details
+ * Deep copy means all points contained in the identifier structure will be newly allocated
+ * and original values copied to the new allocated space. You need to deallocate this copy
+ * just like the original identifier.
+ *
+ * @param original_id Original identifier to create copy from
+ * @return Pointer to the deep copy of original identifier
+ */
+identifier_t *identifier_clone(identifier_t *original_id);
 
 #endif
 

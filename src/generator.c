@@ -36,6 +36,7 @@ static unsigned int while_cnt = 1;
 static unsigned int nil_check_cnt = 1;
 static unsigned int zero_div_check_cnt = 1;
 static unsigned int return_assign_cnt = 1;
+static unsigned int cycle_level = 0;
 
 void gen_reads(void)
 {
@@ -290,6 +291,8 @@ void gen_fun_start(identifier_t *id)
     // tmp variables used for string operations, LEQ, GEQ and zero_div_check
     printf("DEFVAR LF@$op_tmp_1\n");
     printf("DEFVAR LF@$op_tmp_2\n");
+    printf("JUMP &%s_def_vars\n", id->name);
+    printf("LABEL &%s_body\n", id->name);
 
     fun_param_cnt = 1;
     retval_cnt = 1;
@@ -389,15 +392,24 @@ void gen_returned_assign(symqueue_t *queue, bool conv_to_number)
 }
 
 // prepares variable for later assignment
-void gen_var_dec(identifier_t *id, symqueue_t *queue)
+void gen_var_dec(identifier_t *id, symqueue_t *main_queue, symqueue_t *cycle_queue)
 {
-    // TODO solve redefinition in while
-    printf("DEFVAR LF@%s_%lu_%lu\n",
-            id->name,
-            id->line,
-            id->character);
+    identifier_t *id_clone;
 
-    symqueue_add(queue, id);
+    if (cycle_level == 0) {
+        // We're out of cycle, DEFVAR can be generated here
+        printf("DEFVAR LF@%s_%lu_%lu\n",
+               id->name,
+               id->line,
+               id->character);
+    } else {
+        // We're inside the cycle, DEFVAR is forbidden here
+        // --> just remember the identifier
+        id_clone = identifier_clone(id);
+        symqueue_add(cycle_queue, id_clone);
+    }
+
+    symqueue_add(main_queue, id);
 }
 
 void gen_var_dec_assign(symqueue_t *queue, bool value_on_stack)
@@ -464,8 +476,30 @@ void gen_var_retval(void)
     retval_cnt++;
 }
 
-void gen_fun_end(identifier_t *id)
+void gen_fun_end(identifier_t *id, symqueue_t *cycle_queue)
 {
+    identifier_t *var;
+
+    printf("JUMP &%s_end\n", id->name);
+    printf("LABEL &%s_def_vars\n", id->name);
+    printf("# Declaration of identifiers from cycles\n");
+
+    while (!symqueue_is_empty(cycle_queue)) {
+        var = symqueue_pop(cycle_queue);
+        printf("DEFVAR LF@%s_%lu_%lu\n",
+               var->name,
+               var->line,
+               var->character);
+
+        // There is a deep copy of original identifier from table of symbols,
+        // so it needs to completely deallocate (it is used only for this purpose)
+        free(var->name);
+        free(var);
+    }
+
+    printf("JUMP &%s_body\n", id->name);
+    printf("LABEL &%s_end\n", id->name);
+
     printf("POPFRAME\n");
     printf("RETURN\n");
     printf("LABEL &%s_skip\n", id->name);
@@ -566,17 +600,17 @@ unsigned int gen_if_start()
     return if_cnt;
 }
 
-void gen_if_else(unsigned int if_cnt)
+void gen_if_else(unsigned int if_cnt_local)
 {
     printf("# ELSE ...\n");
-    printf("JUMP &end_if_%u\n", if_cnt);
-    printf("LABEL &else_%u\n", if_cnt);
+    printf("JUMP &end_if_%u\n", if_cnt_local);
+    printf("LABEL &else_%u\n", if_cnt_local);
     printf("# code for ELSE follows...\n");
 }
 
-void gen_if_end(unsigned int if_cnt)
+void gen_if_end(unsigned int if_cnt_local)
 {
-    printf("LABEL &end_if_%u\n", if_cnt);
+    printf("LABEL &end_if_%u\n", if_cnt_local);
 }
 
 unsigned int gen_while_start_before_expr()
@@ -585,6 +619,9 @@ unsigned int gen_while_start_before_expr()
     printf("# WHILE EXPR DO ...\n");
     printf("LABEL &while_%u\n", while_cnt);
     printf("# code for EXPR follows...\n");
+
+    cycle_level++;
+
     return while_cnt;
 }
 
@@ -611,6 +648,8 @@ void gen_while_end(unsigned int counter)
 {
     printf("JUMP &while_%u\n", counter);
     printf("LABEL &while_end_%u\n", counter);
+
+    cycle_level--;
 }
 
 void gen_nil_check_top()

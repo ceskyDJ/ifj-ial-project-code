@@ -11,7 +11,7 @@
 #include "context.h"
 #include "exit_codes.h"
 #include "kwtable.h"
-#define LOG_LEVEL DEBUG
+#define LOG_LEVEL ERROR
 #include "logger.h"
 #include "scanner.h"
 #include "string_factory.h"
@@ -93,29 +93,6 @@ static void debug_identifier(identifier_t *id)
     } else {
         LOG_DEBUG_M("IDENTIFIER TYPE NOT SET");
     }
-}
-
-static bool is_valid_variable(context_t *ctx, token_t *token)
-{
-    symtable_t *symtable;
-    identifier_t *tmp_id;
-
-    // Go through all tables of symbols and try to find checked identifier with type (declared variable)
-    symstack_most_local(ctx->symstack);
-    while (symstack_is_active(ctx->symstack)) {
-        symtable = symstack_get(ctx->symstack);
-        tmp_id = symtable_find(symtable, token->identifier->name);
-
-        if (tmp_id && tmp_id->type == VARIABLE) {
-            // It's a valid variable, so we are done here
-            token->identifier = tmp_id;
-            return true;
-        }
-
-        symstack_next(ctx->symstack);
-    }
-
-    return false;
 }
 
 static token_t term(token_t token, context_t *ctx)
@@ -692,7 +669,7 @@ static token_t e_1(token_t token, context_t *ctx)
 
         string_appendc(ctx->retval, expr_type);
 
-        gen_var_active_assign(ctx->symqueue, true);
+        gen_var_active_assign(ctx->main_symqueue, true);
 
         token = get_next_token(ctx);
 
@@ -779,7 +756,7 @@ static token_t e_list(token_t token, context_t *ctx)
     // bottom up prepared value on stack
     // I believe there must be the same number of expressions
     // as there are variables on LHS
-    gen_var_active_assign(ctx->symqueue, true);
+    gen_var_active_assign(ctx->main_symqueue, true);
 
     token = get_next_token(ctx);
 
@@ -815,7 +792,7 @@ static token_t ret_e_list(token_t token, context_t *ctx)
     for (int i = 0; i < retval_len; i++) {
         snprintf(retval_names[i], 20, "%%retval_%d", i+1);
         retval_ids[i].name = retval_names[i];
-        symqueue_add(ctx->symqueue, &retval_ids[i]);
+        symqueue_add(ctx->main_symqueue, &retval_ids[i]);
         LOG_DEBUG("added '%s' to symqueue", retval_names[i]);
     }
 
@@ -873,7 +850,7 @@ static token_t id_seq_1(token_t token, context_t *ctx)
             }
             LOG_DEBUG_M("id ok");
             debug_token(token);
-            gen_var_set_active(token.identifier, ctx->symqueue);
+            gen_var_set_active(token.identifier, ctx->main_symqueue);
             string_appendc(ctx->param, token.identifier->var.type);
             token = get_next_token(ctx);
             token = id_seq_1(token, ctx);
@@ -901,7 +878,7 @@ static token_t id_seq(token_t token, context_t *ctx)
         LOG_DEBUG_M("id ok");
         debug_token(token);
 
-        gen_var_set_active(token.identifier, ctx->symqueue);
+        gen_var_set_active(token.identifier, ctx->main_symqueue);
         string_appendc(ctx->param, token.identifier->var.type);
         token = get_next_token(ctx);
         token = id_seq_1(token, ctx);
@@ -980,10 +957,10 @@ static token_t stmt(token_t token, context_t *ctx)
                 ctx->saved_id = backup;
 
                 for (int i = 0; i < saved_LHS_len; i++) {
-                    gen_returned_assign(ctx->symqueue, conv_returned[i]);
+                    gen_returned_assign(ctx->main_symqueue, conv_returned[i]);
                 }
 
-                assert(symqueue_is_empty(ctx->symqueue));
+                assert(symqueue_is_empty(ctx->main_symqueue));
                 free(saved_LHS);
 
                 return token;
@@ -1019,7 +996,7 @@ static token_t stmt(token_t token, context_t *ctx)
             exit(EASSIGN); // TODO correct exit code?
         }
 
-        assert(symqueue_is_empty(ctx->symqueue));
+        assert(symqueue_is_empty(ctx->main_symqueue));
         string_clear(ctx->param);
         string_clear(ctx->retval);
 
@@ -1060,9 +1037,9 @@ static token_t var_assign(token_t token, context_t *ctx)
                 token.identifier = fun_id;
                 token = call(token, ctx);
 
-                // TODO no implicit conv here, right?
-                gen_returned_assign(ctx->symqueue, false);
-                assert(symqueue_is_empty(ctx->symqueue));
+                // TODO no implicit conv here, right?;
+                gen_returned_assign(ctx->main_symqueue, false);
+                assert(symqueue_is_empty(ctx->main_symqueue));
                 free(saved_LHS);
 
                 return token;
@@ -1088,51 +1065,51 @@ static token_t var_assign(token_t token, context_t *ctx)
             exit(EASSIGN);
         }
         // generate
-        gen_var_dec_assign(ctx->symqueue, true);
+        gen_var_dec_assign(ctx->main_symqueue, true);
         free(saved_LHS);
 
         return token;
 
     } else if (token.type == IDENTIFIER) {
             LOG_DEBUG_M("id unget and return");
-            gen_var_dec_assign(ctx->symqueue, false);
+            gen_var_dec_assign(ctx->main_symqueue, false);
             unget_token(token);
             return token;
 
     } else if (token.type == KEYWORD) {
         if (*token.keyword == KW_RETURN) {
             LOG_DEBUG_M("return unget and return");
-            gen_var_dec_assign(ctx->symqueue, false);
+            gen_var_dec_assign(ctx->main_symqueue, false);
             unget_token(token);
             return token;
 
         } else if (*token.keyword == KW_END) {
             LOG_DEBUG_M("end unget and return");
-            gen_var_dec_assign(ctx->symqueue, false);
+            gen_var_dec_assign(ctx->main_symqueue, false);
             unget_token(token);
             return token;
 
         } else if (*token.keyword == KW_LOCAL) {
             LOG_DEBUG_M("local unget and return");
-            gen_var_dec_assign(ctx->symqueue, false);
+            gen_var_dec_assign(ctx->main_symqueue, false);
             unget_token(token);
             return token;
 
         } else if (*token.keyword == KW_IF) {
             LOG_DEBUG_M("if unget and return");
-            gen_var_dec_assign(ctx->symqueue, false);
+            gen_var_dec_assign(ctx->main_symqueue, false);
             unget_token(token);
             return token;
 
         } else if (*token.keyword == KW_ELSE) {
             LOG_DEBUG_M("else unget and return");
-            gen_var_dec_assign(ctx->symqueue, false);
+            gen_var_dec_assign(ctx->main_symqueue, false);
             unget_token(token);
             return token;
 
         } else if (*token.keyword == KW_WHILE) {
             LOG_DEBUG_M("while unget and return");
-            gen_var_dec_assign(ctx->symqueue, false);
+            gen_var_dec_assign(ctx->main_symqueue, false);
             unget_token(token);
             return token;
         }
@@ -1169,7 +1146,7 @@ static token_t var_dec(token_t token, context_t *ctx)
                 ctx->saved_id->type = VARIABLE;
 
                 // generate
-                gen_var_dec(ctx->saved_id, ctx->symqueue);
+                gen_var_dec(ctx->saved_id, ctx->main_symqueue, ctx->cycle_symqueue);
 
                 LOG_DEBUG_M("id ok");
                 debug_token(token);
@@ -1733,7 +1710,7 @@ static token_t fun_def(token_t token, context_t *ctx)
                         debug_identifier(function_id);
 
                         // generate
-                        gen_fun_end(function_id);
+                        gen_fun_end(function_id, ctx->cycle_symqueue);
 
                         return token;
                     }

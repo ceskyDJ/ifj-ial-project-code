@@ -81,8 +81,12 @@ int main()
     if (!retval)
         exit(EINTERNAL);
 
-    symqueue_t *symqueue = symqueue_create();
-    if (!symqueue)
+    symqueue_t *main_symqueue = symqueue_create();
+    if (!main_symqueue)
+        exit(EINTERNAL);
+
+    symqueue_t *cycle_symqueue = symqueue_create();
+    if (!cycle_symqueue)
         exit(EINTERNAL);
 
     init_builtin_functions(global_symtable);
@@ -96,7 +100,8 @@ int main()
     ctx.string = string;
     ctx.param = param;
     ctx.retval = retval;
-    ctx.symqueue = symqueue;
+    ctx.main_symqueue = main_symqueue;
+    ctx.cycle_symqueue = cycle_symqueue;
 
     parser_start(&ctx);
 
@@ -114,8 +119,11 @@ int main()
     kwtable_destroy(kwtable);
     symtable_destroy(global_symtable);
     symstack_destroy(symstack);
-    while (!symqueue_is_empty(symqueue))
-        symqueue_pop(symqueue);
-    symqueue_destroy(symqueue);
+    while (!symqueue_is_empty(main_symqueue))
+        symqueue_pop(main_symqueue);
+    symqueue_destroy(main_symqueue);
+    while (!symqueue_is_empty(cycle_symqueue))
+        symqueue_pop(cycle_symqueue);
+    symqueue_destroy(cycle_symqueue);
     return 0;
 }

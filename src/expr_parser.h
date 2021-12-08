@@ -69,6 +69,22 @@ enum expr_parser_operations {
 typedef non_term_t (*rule_fun_t)(exprstack_t *);
 
 /**
+ * Checks if identifier in the provided token is a variable
+ *
+ * @details
+ * Valid variable is of type VARIABLE, which means it's ready to use.
+ * Token is passed by pointer and will be changed! The identifier in
+ * it will be replaced with its valid version. This is applied when
+ * the most local version isn't valid. This function finds nearest
+ * valid version (from the nearest table of symbols).
+ *
+ * @param ctx Pointer to context with dependencies
+ * @param token Pointer to token with the identifier
+ * @return Is it a valid variable?
+ */
+bool is_valid_variable(context_t *ctx, token_t *token);
+
+/**
  * Runs parsing expressions until valid input will arrive
  *
  * @details

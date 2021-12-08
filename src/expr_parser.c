@@ -217,29 +217,6 @@ static void check_same_types(non_term_t *first_op, non_term_t *second_op, bool n
     exit(EEXPTYPE);
 }
 
-static bool is_valid_variable(context_t *ctx, token_t *token)
-{
-    symtable_t *symtable;
-    identifier_t *tmp_id;
-
-    // Go through all tables of symbols and try to find checked identifier with type (declared variable)
-    symstack_most_local(ctx->symstack);
-    while (symstack_is_active(ctx->symstack)) {
-        symtable = symstack_get(ctx->symstack);
-        tmp_id = symtable_find(symtable, token->identifier->name);
-
-        if (tmp_id && tmp_id->type == VARIABLE) {
-            // It's a valid variable, so we are done here
-            token->identifier = tmp_id;
-            return true;
-        }
-
-        symstack_next(ctx->symstack);
-    }
-
-    return false;
-}
-
 static non_term_t strlen_rule(exprstack_t *s)
 {
     token_t strlen_term = {.type = STRLEN};
@@ -769,6 +746,29 @@ static non_term_t term_rule(exprstack_t *s)
     gen_push_term(top_term);
 
     return result_non_term;
+}
+
+bool is_valid_variable(context_t *ctx, token_t *token)
+{
+    symtable_t *symtable;
+    identifier_t *tmp_id;
+
+    // Go through all tables of symbols and try to find checked identifier with type (declared variable)
+    symstack_most_local(ctx->symstack);
+    while (symstack_is_active(ctx->symstack)) {
+        symtable = symstack_get(ctx->symstack);
+        tmp_id = symtable_find(symtable, token->identifier->name);
+
+        if (tmp_id && tmp_id->type == VARIABLE) {
+            // It's a valid variable, so we are done here
+            token->identifier = tmp_id;
+            return true;
+        }
+
+        symstack_next(ctx->symstack);
+    }
+
+    return false;
 }
 
 enum variable_type expr_parser_start(context_t *context)
