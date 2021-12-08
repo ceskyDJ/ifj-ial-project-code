@@ -1,5 +1,5 @@
  -- Program 19: parametr chr() mimo rozsah (vrací nil) 
-re "ifj21"
+require "ifj21"
 function main()
   local x : string
   local y : string
@@ -16,5 +16,4 @@ function main()
   end
 
 end
-main() e
-
+main()

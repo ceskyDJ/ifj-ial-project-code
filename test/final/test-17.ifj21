@@ -1,5 +1,6 @@
  -- Program 17: parametr v ord() mimo rozmezí (vrací nil)
-require "ifj21" function main()
+require "ifj21"
+function main()
   local s1 : string = "AbCdEf"
   local x : integer = 50
   local y : integer
