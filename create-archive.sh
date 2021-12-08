@@ -20,8 +20,8 @@ cd ifj-ial-project-docs || exit 1
 
 # Compile documentation (from its Git repository)
 # BibTeX may not be needed
-grep -q "\citation" "$doc_name.tex" && pdflatex "$doc_name.tex"
-grep -q "\citation" "$doc_name.tex" && bibtex "$doc_name.tex"
+grep -q "\cite" "$doc_name.tex" && pdflatex "$doc_name.tex"
+grep -q "\cite" "$doc_name.tex" && bibtex "$doc_name.aux"
 pdflatex "$doc_name.tex"
 pdflatex "$doc_name.tex"
 
@@ -29,7 +29,7 @@ pdflatex "$doc_name.tex"
 cd ../ || exit 1
 
 # Move result PDF file into tmp folder
-mv ifj-ial-project-docs/"$doc_name.tex" dokumentace.pdf
+mv ifj-ial-project-docs/"$doc_name.pdf" dokumentace.pdf
 
 # Remove directory with documentation sources
 rm -rf ifj-ial-project-docs
