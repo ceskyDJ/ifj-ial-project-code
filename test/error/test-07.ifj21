@@ -1,0 +1,8 @@
+-- 5 (incorrect return types)
+require "ifj21"
+
+function main() : string
+    local a : integer = 11
+
+    return a
+end

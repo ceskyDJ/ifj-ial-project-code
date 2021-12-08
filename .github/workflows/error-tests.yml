@@ -1,0 +1,27 @@
+name: 'Tests | Error tests'
+
+on: [push]
+
+jobs:
+  # Automatically compile and run all of available error tests
+  run-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up GCC
+        uses: egor-tensin/setup-gcc@v1
+        with:
+          version: 10
+          platform: x64
+
+      - name: We need gcc-10.2 but we have gcc-10 only...
+        run: sudo ln -s /usr/bin/gcc-10 /usr/local/bin/gcc-10.2
+
+      - name: Run Make rule for compiling ifj21_compiler
+        run: cd src; make
+        env:
+          EXTRA_CFLAGS: -Werror
+
+      - name: Run error tests
+        run: ./test/error/run-error-tests.sh

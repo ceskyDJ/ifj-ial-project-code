@@ -1,0 +1,9 @@
+-- 3 (redefined variable)
+require "ifj21"
+
+function main()
+    local a : integer
+    a = 12
+    local a : number
+    a = 12.0
+end

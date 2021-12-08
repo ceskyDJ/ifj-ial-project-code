@@ -1,0 +1,6 @@
+-- 3 (not defined variable)
+require "ifj21"
+
+function main()
+    a = 12
+end

@@ -1,0 +1,6 @@
+-- 4 (incompatible type at assignment)
+require "ifj21"
+
+function main()
+    local a : integer = "foo"
+end

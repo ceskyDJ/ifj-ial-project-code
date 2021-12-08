@@ -1,0 +1,9 @@
+-- 6 (incompatible types in expression)
+require "ifj21"
+
+function main()
+    local a : integer = 11
+    local b : string = "foo"
+
+    b = a .. b
+end

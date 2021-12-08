@@ -1,0 +1,6 @@
+-- 2 (syntax error)
+require "ifj21"
+
+function main()
+    local local n: number = 2.2
+end
