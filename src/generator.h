@@ -88,7 +88,6 @@ void gen_if_else(unsigned int if_cnt_local);
 
 void gen_if_end(unsigned int if_cnt_local);
 
-// TODO in while we want skipping DEFVARs, implement it
 unsigned int gen_while_start_before_expr(void);
 
 void gen_while_start_after_expr(unsigned int counter);

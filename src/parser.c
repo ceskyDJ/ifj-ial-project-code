@@ -190,7 +190,6 @@ static token_t term(token_t token, context_t *ctx)
 
     } else if (token.type == KEYWORD) {
         if (*token.keyword == KW_NIL) {
-            // TODO nil as term in function call other than write()?
             if (!strcmp(ctx->saved_id->fun.param, "write")) {
                 gen_write_nil();
             }
@@ -993,7 +992,7 @@ static token_t stmt(token_t token, context_t *ctx)
             LOG_ERROR("LHS types '%s' do not match RHS types '%s'",
                     saved_LHS,
                     string_expose(ctx->retval));
-            exit(EASSIGN); // TODO correct exit code?
+            exit(EASSIGN);
         }
 
         assert(symqueue_is_empty(ctx->main_symqueue));
@@ -1037,7 +1036,6 @@ static token_t var_assign(token_t token, context_t *ctx)
                 token.identifier = fun_id;
                 token = call(token, ctx);
 
-                // TODO no implicit conv here, right?;
                 gen_returned_assign(ctx->main_symqueue, false);
                 assert(symqueue_is_empty(ctx->main_symqueue));
                 free(saved_LHS);
@@ -1730,9 +1728,6 @@ static token_t fun_signature(token_t token, context_t *ctx)
     if (token.type == KEYWORD) {
         if (*token.keyword == KW_FUNCTION) {
 
-            // TODO commented this because fun dec generated code for retvals
-            //ctx->saved_id->type = FUNCTION;
-
             LOG_DEBUG_M("function ok");
 
             token = get_next_token(ctx);
@@ -1828,7 +1823,6 @@ static token_t code_1(token_t token, context_t *ctx)
             return token;
         }
     } else if (token.type == IDENTIFIER) {
-        // TODO check it is a defined function
         // really? it can be only declared and definition might follow, right?
         if (!symtable_find(global, token.identifier->name)) {
             LOG_ERROR("%s() is not defined/declared function, cannot be called",
