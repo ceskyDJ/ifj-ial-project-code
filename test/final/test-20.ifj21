@@ -1,0 +1,29 @@
+require "ifj21"
+
+function main()
+    write("Enter an integer: ")
+    local a : integer = readi()
+    local b : integer = a
+    while a >= 0 do
+        local x : integer = a * a
+        write(x, "\n")
+        a = a - 1
+    end
+    a = b
+    write("Enter string: ")
+    while b > 0 do
+        local s : string = reads()
+        b = #s
+        if b > 1 then
+            while b > 0 do
+                local x : integer = b * b
+                write(x, "\n")
+                b = b - 1
+            end
+        else
+            write("empty string, breaking out of while\n")
+        end
+        write("Enter string: ")
+    end
+end
+main()
