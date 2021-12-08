@@ -11,7 +11,7 @@
 #include "context.h"
 #include "exit_codes.h"
 #include "kwtable.h"
-#define LOG_LEVEL ERROR
+#define LOG_LEVEL DEBUG
 #include "logger.h"
 #include "scanner.h"
 #include "string_factory.h"
@@ -95,7 +95,6 @@ static void debug_identifier(identifier_t *id)
     }
 }
 
-// TODO stolen from expr_parser.c
 static bool is_valid_variable(context_t *ctx, token_t *token)
 {
     symtable_t *symtable;
@@ -142,9 +141,6 @@ static token_t term(token_t token, context_t *ctx)
                 LOG_DEBUG("will do implicit conv for variable '%s'",
                         token.identifier->name);
                 implicit_conv = true;
-                // TODO do not rewrite it like this because we would generate
-                // number when really the value is integer
-                //token.identifier->var.type = VAR_NUMBER;
                 converted = VAR_NUMBER;
             }
         }
@@ -165,14 +161,12 @@ static token_t term(token_t token, context_t *ctx)
 
     } else if (token.type == INTEGER) {
         LOG_DEBUG_M("TYPE integer ok");
-        // TODO implicit conv to number
 
         param_index = strlen(string_expose(ctx->param));
         if (ctx->saved_id->fun.param[param_index] == VAR_NUMBER) {
                 LOG_DEBUG("will do implicit conv for integer term '%d'",
                         token.integer);
                 implicit_conv = true;
-                //token.type = NUMBER;
                 string_appendc(ctx->param, VAR_NUMBER);
         } else {
             string_appendc(ctx->param, VAR_INTEGER);
@@ -324,7 +318,7 @@ static token_t call(token_t token, context_t *ctx)
             token = get_next_token(ctx);
             debug_token(token);
 
-            // TODO again implicit conv integer->number
+            // implicit conv integer->number is done in term()
             token = term_seq(token, ctx);
 
             if (!strcmp(fun_id->fun.param, "write")) {
@@ -357,6 +351,7 @@ static token_t call(token_t token, context_t *ctx)
             return token;
         }
         LOG_ERROR("%s() not declared/defined", token.identifier->name);
+        exit(EDEF);
     }
 
     exit(ESYNTAX);
@@ -489,7 +484,6 @@ static token_t fun_ret_list_1(token_t token, context_t *ctx)
                 LOG_DEBUG_M("integer diving");
                 token = type(token, ctx);
                 string_appendc(ctx->retval, VAR_INTEGER);
-                // TODO do not gen in dec
                 if (ctx->saved_id->type == FUNCTION)
                     gen_var_retval();
                 token = fun_ret_list_1(token, ctx);
@@ -575,7 +569,6 @@ static token_t fun_ret_list(token_t token, context_t *ctx)
             LOG_DEBUG_M("integer diving");
             token = type(token, ctx);
             string_appendc(ctx->retval, VAR_INTEGER);
-            // TODO don't generate if we are in declaration
             LOG_DEBUG("fun_ret_list() integer: saved_id->type: %d", ctx->saved_id->type);
             debug_identifier(ctx->saved_id);
             if (ctx->saved_id->type == FUNCTION)
@@ -673,19 +666,31 @@ static token_t e_1(token_t token, context_t *ctx)
     LOG_DEBUG_M();
     debug_token(token);
     enum variable_type expr_type;
+    int retval_index;
 
     if (token.type == COMMA) {
         LOG_DEBUG_M(", ok");
 
-        expr_type = expr_parser_start(ctx);
-        LOG_DEBUG("expr is '%c'", expr_type);
-        string_appendc(ctx->retval, expr_type);
-
-        // TODO on each expression, if integer and param is number
-        // do implicit conv
-
         LOG_DEBUG_M("e_1() saved_id is");
         debug_identifier(ctx->saved_id);
+
+        expr_type = expr_parser_start(ctx);
+        LOG_DEBUG("expr is '%c'", expr_type);
+
+        retval_index = strlen(string_expose(ctx->retval));
+        LOG_DEBUG("e_1() retval_index: %d, expr: %c, retval: '%s'",
+                retval_index,
+                expr_type,
+                string_expose(ctx->retval));
+
+        if (ctx->saved_id->fun.retval[retval_index] == VAR_NUMBER &&
+                expr_type == VAR_INTEGER) {
+            LOG_DEBUG_M("will do implicit conv for expr result");
+            gen_conv_to_number_top();
+            expr_type = VAR_NUMBER;
+        }
+
+        string_appendc(ctx->retval, expr_type);
 
         gen_var_active_assign(ctx->symqueue, true);
 
@@ -696,8 +701,6 @@ static token_t e_1(token_t token, context_t *ctx)
         return token;
     } else if (token.type == IDENTIFIER) {
         LOG_DEBUG_M("id unget and return");
-        // TODO these ungets will be obsolete by bottom up, right?
-        // it doesn't seem so, but look at it later
         unget_token(token);
         return token;
 
@@ -742,7 +745,7 @@ static token_t e_list(token_t token, context_t *ctx)
     LOG_DEBUG_M();
     debug_token(token);
     enum variable_type expr_type;
-    int param_index;
+    int retval_index;
 
     token = get_next_token(ctx);
     if (token.type == KEYWORD) {
@@ -755,13 +758,13 @@ static token_t e_list(token_t token, context_t *ctx)
     expr_type = expr_parser_start(ctx);
     LOG_DEBUG("expr is '%c'", expr_type);
 
-    param_index = strlen(string_expose(ctx->retval));
+    retval_index = strlen(string_expose(ctx->retval));
     LOG_DEBUG("e_list() after first expr, retval '%s' len: %d",
             string_expose(ctx->retval),
-            param_index);
+            retval_index);
 
     // conv if corresponding LHS type is number and we are integer
-    if (string_expose(ctx->param)[param_index] == VAR_NUMBER &&
+    if (ctx->saved_id->fun.retval[retval_index] == VAR_NUMBER &&
             expr_type == VAR_INTEGER) {
         LOG_DEBUG_M("will do implicit conv for expr result");
         gen_conv_to_number_top();
@@ -773,7 +776,7 @@ static token_t e_list(token_t token, context_t *ctx)
     LOG_DEBUG_M("e_list: saved_id:");
     debug_identifier(ctx->saved_id);
 
-    // TODO  bottom up prepared value on stack
+    // bottom up prepared value on stack
     // I believe there must be the same number of expressions
     // as there are variables on LHS
     gen_var_active_assign(ctx->symqueue, true);
@@ -818,7 +821,7 @@ static token_t ret_e_list(token_t token, context_t *ctx)
 
     token = e_list(token, ctx);
 
-    // TODO implicit conv if returning integer when number expected
+    // implicit conv if returning integer when number expected is done in e_list()
     LOG_DEBUG("ret_e_list: retval '%s'", string_expose(ctx->retval));
     debug_identifier(ctx->saved_id);
 
@@ -924,6 +927,10 @@ static token_t stmt(token_t token, context_t *ctx)
                 string_expose(ctx->param));
         saved_LHS = string_export(ctx->param);
 
+        int saved_LHS_len = strlen(saved_LHS);
+        bool conv_returned[saved_LHS_len];
+        for (int i = 0; i < saved_LHS_len; i++)
+            conv_returned[i] = false;
 
         token = get_next_token(ctx);
 
@@ -935,21 +942,34 @@ static token_t stmt(token_t token, context_t *ctx)
         debug_token(token);
 
         if (token.type == IDENTIFIER) {
-            // TODO moved string_clear into this if,
-            // before it was above it
             string_clear(ctx->param);
             identifier_t *fun_id = symtable_find(symstack_global_symtable(ctx->symstack),
                                                 token.identifier->name);
             if (fun_id) {
+                if ((int)strlen(fun_id->fun.retval) < saved_LHS_len) {
+                    LOG_ERROR("%s():'%s' does not return enough values to fill LHS '%s'",
+                            fun_id->name,
+                            fun_id->fun.retval,
+                            saved_LHS);
+                    exit(EFUNCALL);
+                }
                 // check LHS (saved in ctx->param) is prefix of function's retval
                 LOG_DEBUG("LHS '%s' (ctx->param '%s') %s() retval '%s'",
                         saved_LHS, string_expose(ctx->param), fun_id->name, fun_id->fun.retval);
-                if (strncmp(saved_LHS, fun_id->fun.retval, strlen(saved_LHS))) {
-                    LOG_ERROR("LHS '%s' is not compatible with %s() return values '%s'",
-                            saved_LHS,
-                            fun_id->name,
-                            fun_id->fun.retval);
-                    exit(EFUNCALL);
+
+                for (int i = 0; i < saved_LHS_len; i++) {
+                    if (saved_LHS[i] == VAR_NUMBER && fun_id->fun.retval[i] == VAR_INTEGER) {
+                        conv_returned[i] = true;
+                        LOG_DEBUG("will apply implicit conv at index %d", i);
+                    } else if (saved_LHS[i] == fun_id->fun.retval[i]) {
+                        continue;
+                    } else {
+                        LOG_ERROR("LHS '%s' is not compatible with %s() return values '%s'",
+                                saved_LHS,
+                                fun_id->name,
+                                fun_id->fun.retval);
+                        exit(EFUNCALL);
+                    }
                 }
                 LOG_DEBUG("ok, we can call %s()", fun_id->name);
 
@@ -959,8 +979,9 @@ static token_t stmt(token_t token, context_t *ctx)
                 token = call(token, ctx);
                 ctx->saved_id = backup;
 
-                for (int i = 0; i < (int)strlen(saved_LHS); i++)
-                    gen_returned_assign(ctx->symqueue);
+                for (int i = 0; i < saved_LHS_len; i++) {
+                    gen_returned_assign(ctx->symqueue, conv_returned[i]);
+                }
 
                 assert(symqueue_is_empty(ctx->symqueue));
                 free(saved_LHS);
@@ -972,7 +993,20 @@ static token_t stmt(token_t token, context_t *ctx)
         // RHS is expression list
         unget_token(token);
 
+        // make fake identifier and save it in context for e_list()
+        // so it thinks we are in a function that returns our LHS
+        backup = ctx->saved_id;
+        identifier_t fake_fun = {
+            .type = FUNCTION,
+            .name = "$fake_fun_LHS$",
+            .fun = {
+                .retval = saved_LHS,
+            },
+        };
+        ctx->saved_id = &fake_fun;
+
         token = e_list(token, ctx);
+        ctx->saved_id = backup;
 
         LOG_DEBUG("stmt analyzed: '%s' = '%s'",
                 saved_LHS,
@@ -1026,7 +1060,8 @@ static token_t var_assign(token_t token, context_t *ctx)
                 token.identifier = fun_id;
                 token = call(token, ctx);
 
-                gen_returned_assign(ctx->symqueue);
+                // TODO no implicit conv here, right?
+                gen_returned_assign(ctx->symqueue, false);
                 assert(symqueue_is_empty(ctx->symqueue));
                 free(saved_LHS);
 
@@ -1034,7 +1069,6 @@ static token_t var_assign(token_t token, context_t *ctx)
             }
         }
         // RHS is single expression
-        // TODO saved_LHS doesn't work
 
         unget_token(token);
         LOG_DEBUG_M("...expression code");
@@ -1634,7 +1668,7 @@ static token_t fun_def(token_t token, context_t *ctx)
 
                 LOG_DEBUG_M("saved before fun_ret()");
                 debug_identifier(ctx->saved_id);
-                // TODO hack
+                // hack, should work I believe
                 if (ctx->saved_id->type != FUNCTION) {
                     ctx->saved_id->type = FUNCTION;
                     token = fun_ret(token, ctx);
@@ -1676,7 +1710,6 @@ static token_t fun_def(token_t token, context_t *ctx)
 
                 token = get_next_token(ctx);
 
-                // TODO don't remember what I wanted here...
                 ctx->saved_id = function_id;
 
                 token = body(token, ctx);

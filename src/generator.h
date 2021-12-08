@@ -55,7 +55,7 @@ void gen_call_param(token_t *token, bool conv_to_number);
 
 void gen_call(identifier_t *id);
 
-void gen_returned_assign(symqueue_t *queue);
+void gen_returned_assign(symqueue_t *queue, bool conv_to_number);
 
 void gen_var_dec(identifier_t *id, symqueue_t *queue);
 
