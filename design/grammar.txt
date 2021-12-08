@@ -14,84 +14,84 @@ Dictionary:
 starting non-terminal: PROG
 --- paste what is below to the simulator ---
 
-PROG ::= REQUIRE CODE
+1: PROG ::= REQUIRE CODE
 
-REQUIRE ::= require "ifj21"
+2: REQUIRE ::= require "ifj21"
 
-CODE ::= CODE' CODE''
-CODE ::= ''
-CODE' ::= FUN_DEC
-CODE' ::= FUN_DEF
-CODE' ::= CALL
-CODE'' ::= CODE' CODE''
-CODE'' ::= ''
+3: CODE ::= CODE' CODE''
+4: CODE ::= ''
+5: CODE' ::= FUN_DEC
+6: CODE' ::= FUN_DEF
+7: CODE' ::= CALL
+8: CODE'' ::= CODE' CODE''
+9: CODE'' ::= ''
 
-FUN_DEC ::= global id : FUN_SIGNATURE
-FUN_SIGNATURE ::= function ( TYPE_LIST ) FUN_RET
-TYPE_LIST::= TYPE TYPE_LIST'
-TYPE_LIST::= ''
-TYPE_LIST' ::= , TYPE TYPE_LIST'
-TYPE_LIST' ::= ''
-FUN_RET ::= : FUN_RET_LIST
-FUN_RET ::= ''
+10: FUN_DEC ::= global id : FUN_SIGNATURE
+11: FUN_SIGNATURE ::= function ( TYPE_LIST ) FUN_RET
+12: TYPE_LIST::= TYPE TYPE_LIST'
+13: TYPE_LIST::= ''
+14: TYPE_LIST' ::= , TYPE TYPE_LIST'
+15: TYPE_LIST' ::= ''
+16: FUN_RET ::= : FUN_RET_LIST
+17: FUN_RET ::= ''
 
-CALL ::= id ( TERM_SEQ )
+18: CALL ::= id ( TERM_SEQ )
 
-TERM_SEQ ::= TERM TERM_SEQ'
-TERM_SEQ ::= ''
-TERM_SEQ' ::= , TERM TERM_SEQ'
-TERM_SEQ' ::= ''
+19: TERM_SEQ ::= TERM TERM_SEQ'
+20: TERM_SEQ ::= ''
+21: TERM_SEQ' ::= , TERM TERM_SEQ'
+22: TERM_SEQ' ::= ''
 
-FUN_RET_LIST ::= TYPE FUN_RET_LIST'
-FUN_RET_LIST' ::= , TYPE FUN_RET_LIST'
-FUN_RET_LIST' ::= ''
+23: FUN_RET_LIST ::= TYPE FUN_RET_LIST'
+24: FUN_RET_LIST' ::= , TYPE FUN_RET_LIST'
+25: FUN_RET_LIST' ::= ''
 
-RET_STMT ::= return RET_E_LIST
-RET_E_LIST ::= E_LIST
-RET_E_LIST ::= ''
+26: RET_STMT ::= return RET_E_LIST
+27: RET_E_LIST ::= E_LIST
+28: RET_E_LIST ::= ''
 
-FUN_DEF ::= function id ( PARAM_LIST ) FUN_RET BODY end
-PARAM_LIST ::= PARAM PARAM'
-PARAM_LIST ::= ''
-PARAM ::= id : TYPE
-PARAM' ::= , PARAM PARAM'
-PARAM' ::= ''
+29: FUN_DEF ::= function id ( PARAM_LIST ) FUN_RET BODY end
+30: PARAM_LIST ::= PARAM PARAM'
+31: PARAM_LIST ::= ''
+32: PARAM ::= id : TYPE
+33: PARAM' ::= , PARAM PARAM'
+34: PARAM' ::= ''
 
-BODY ::= BODY' BODY''
-BODY ::= ''
-BODY' ::= VAR_DEC_DEF
-BODY' ::= STMT
-BODY' ::= IF
-BODY' ::= WHILE
-BODY' ::= RET_STMT
-BODY' ::= CALL
-BODY'' ::= BODY' BODY''
-BODY'' ::= ''
+35: BODY ::= BODY' BODY''
+36: BODY ::= ''
+37: BODY' ::= VAR_DEC_DEF
+38: BODY' ::= STMT
+39: BODY' ::= IF
+40: BODY' ::= WHILE
+41: BODY' ::= RET_STMT
+42: BODY' ::= CALL
+43: BODY'' ::= BODY' BODY''
+44: BODY'' ::= ''
 
-TERM ::= id
-TERM ::= integer
-TERM ::= number
-TERM ::= string
-TERM ::= nil
+45: TERM ::= id
+46: TERM ::= integer
+47: TERM ::= number
+48: TERM ::= string
+49: TERM ::= nil
 
-VAR_DEC_DEF ::= VAR_DEC VAR_ASSIGN
-VAR_DEC ::= local id : TYPE
-TYPE ::= integer
-TYPE ::= number
-TYPE ::= string
-VAR_ASSIGN ::= = e
-VAR_ASSIGN ::= ''
+50: VAR_DEC_DEF ::= VAR_DEC VAR_ASSIGN
+51: VAR_DEC ::= local id : TYPE
+52: TYPE ::= integer
+53: TYPE ::= number
+54: TYPE ::= string
+55: VAR_ASSIGN ::= = e
+56: VAR_ASSIGN ::= ''
 
-STMT ::= ID_SEQ = E_LIST
-ID_SEQ ::= id ID_SEQ'
-ID_SEQ' ::= , id ID_SEQ'
-ID_SEQ' ::= ''
+57: STMT ::= ID_SEQ = E_LIST
+58: ID_SEQ ::= id ID_SEQ'
+59: ID_SEQ' ::= , id ID_SEQ'
+60: ID_SEQ' ::= ''
 
-E_LIST ::= e E'
-E' ::= , e E'
-E' ::= ''
+61: E_LIST ::= e E'
+62: E' ::= , e E'
+63: E' ::= ''
 
-IF ::= if e then BODY else BODY end
+64: IF ::= if e then BODY else BODY end
 
-WHILE ::= while e do BODY end
+65: WHILE ::= while e do BODY end
 
