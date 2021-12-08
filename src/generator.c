@@ -11,6 +11,7 @@
 
 #include "exit_codes.h"
 #include "generator.h"
+#define LOG_LEVEL ERROR
 #include "logger.h"
 #include "symqueue.h"
 #include "token.h"

@@ -13,6 +13,7 @@
 #include "exprstack.h"
 #include "token.h"
 #include "exit_codes.h"
+#define LOG_LEVEL ERROR
 #include "logger.h"
 #include "symtable.h"
 #include "symstack.h"
