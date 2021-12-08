@@ -364,7 +364,7 @@ void gen_call(identifier_t *id)
     printf("CALL &%s\n", id->name);
 }
 
-void gen_returned_assign(symqueue_t *queue)
+void gen_returned_assign(symqueue_t *queue, bool conv_to_number)
 {
     identifier_t *var = symqueue_pop(queue);
 
@@ -375,6 +375,11 @@ void gen_returned_assign(symqueue_t *queue)
         LOG_ERROR_M("Symqueue is empty");
         exit(EINTERNAL);
     }
+
+    if (conv_to_number)
+        printf("INT2FLOAT TF@%%retval_%d TF@%%retval_%d\n",
+                return_assign_cnt,
+                return_assign_cnt);
 
     printf("MOVE LF@%s_%lu_%lu TF@%%retval_%d\n",
             var->name,
