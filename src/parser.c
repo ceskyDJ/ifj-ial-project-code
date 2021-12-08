@@ -351,6 +351,7 @@ static token_t call(token_t token, context_t *ctx)
             return token;
         }
         LOG_ERROR("%s() not declared/defined", token.identifier->name);
+        exit(EDEF);
     }
 
     exit(ESYNTAX);
