@@ -95,30 +95,6 @@ static void debug_identifier(identifier_t *id)
     }
 }
 
-// TODO stolen from expr_parser.c
-static bool is_valid_variable(context_t *ctx, token_t *token)
-{
-    symtable_t *symtable;
-    identifier_t *tmp_id;
-
-    // Go through all tables of symbols and try to find checked identifier with type (declared variable)
-    symstack_most_local(ctx->symstack);
-    while (symstack_is_active(ctx->symstack)) {
-        symtable = symstack_get(ctx->symstack);
-        tmp_id = symtable_find(symtable, token->identifier->name);
-
-        if (tmp_id && tmp_id->type == VARIABLE) {
-            // It's a valid variable, so we are done here
-            token->identifier = tmp_id;
-            return true;
-        }
-
-        symstack_next(ctx->symstack);
-    }
-
-    return false;
-}
-
 static token_t term(token_t token, context_t *ctx)
 {
     LOG_DEBUG_M();
