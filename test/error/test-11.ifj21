@@ -6,6 +6,4 @@ function main()
     local b : number = 0.0
 
     a = a/b
-	
-   return a
 end

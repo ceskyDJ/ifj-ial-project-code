@@ -1,11 +1,9 @@
  -- 9 (integer dividing by zero)
 require "ifj21"
 
-function main() : string
+function main()
     local a : integer = 1
     local b : integer = 0
 
     a = a // b
-
-    return a
 end
