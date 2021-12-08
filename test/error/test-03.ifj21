@@ -1,0 +1,4 @@
+-- 3 (not defined function)
+require "ifj21"
+
+main()

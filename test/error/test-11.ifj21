@@ -1,0 +1,9 @@
+-- 9 (dividing by zero)
+require "ifj21"
+
+function main()
+    local a : number = 1.0
+    local b : number = 0.0
+
+    a = a/b
+end

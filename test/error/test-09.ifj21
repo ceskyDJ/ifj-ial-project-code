@@ -1,0 +1,16 @@
+-- 8 (runtime nil error)
+require "ifj21"
+
+function main()
+    local a : integer
+
+    a = readi()
+
+    if a > 5 then
+        write("Bigger than 5")
+    else
+        write("Smaller or equal to 5")
+    end
+end
+
+main()
