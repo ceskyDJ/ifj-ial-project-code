@@ -134,6 +134,8 @@ void exprstack_pop_to_stop(exprstack_t *s)
         type = item->type;
         tmp_item = item->prev;
 
+        if (item->type == TERM && item->term_data.type == STRING)
+            free(item->term_data.string);
         free(item);
         item = tmp_item;
     } while (item && type != STOP);
