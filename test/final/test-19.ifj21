@@ -1,0 +1,19 @@
+ -- Program 19: parametr chr() mimo rozsah (vrací nil) 
+require "ifj21"
+function main()
+  local x : string
+  local y : string
+
+  x = chr(-1)
+  y = chr(256)
+
+  if x == nil then
+	write("x is nil")
+  end
+
+  if y == nil then
+	write("y is nil")
+  end
+
+end
+main()

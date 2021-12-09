@@ -1,0 +1,11 @@
+ -- Program 16: parametr nil v ord() (chyba 8)   
+require "ifj21"
+function main()
+  local s1 : string = "Hello world"
+  local x : integer
+  local y : integer
+
+  x = ord(s1, y)
+
+end
+main()

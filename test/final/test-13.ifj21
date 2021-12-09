@@ -1,0 +1,15 @@
+ -- Program 13: funkce ord() 
+require "ifj21"
+function main()
+  local s1 : string = "AbCdEf"
+  local x : integer
+  local y : integer
+
+  x = ord(s1, 2) -- b = 98
+  y = ord(s1, 5) -- E = 69  
+
+  write(x, "\044" , y)
+
+end
+main()
+

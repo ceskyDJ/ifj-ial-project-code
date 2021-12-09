@@ -1,0 +1,19 @@
+ -- Program 12: vestavěné funkce pro práci s řetězci (substr)
+require "ifj21"
+function main()
+  local s1 : string = "Hello world"
+  local s2 : string
+  local s3 : string
+  local s4 : string
+  local s5 : string
+
+  s2 = substr(s1, 1, 5) -- "Hello"
+  s3 = substr(s1, 0, 5) -- ""
+  s4 = substr(s1, 1, 50) -- ""
+  s5 = substr(s1, 2, 1) -- ""
+
+  write(s1, "\044", s2, "\044", "\044", s3, "\044", s4, "\044", s5)
+
+end
+main()
+ 

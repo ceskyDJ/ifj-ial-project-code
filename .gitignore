@@ -1,6 +1,5 @@
 # CMake and Make build help files
 cmake-build-debug/
-build/
 
 # Help files
 *.o

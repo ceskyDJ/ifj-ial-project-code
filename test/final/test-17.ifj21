@@ -1,0 +1,20 @@
+ -- Program 17: parametr v ord() mimo rozmezí (vrací nil)
+require "ifj21"
+function main()
+  local s1 : string = "AbCdEf"
+  local x : integer = 50
+  local y : integer
+
+  x = ord(s1, x)
+  y = ord(s1, 0)
+
+  if x == nil then
+	write("x is nil")
+  end
+
+  if y == nil then
+	write("y is nil")
+  end
+
+end
+main()

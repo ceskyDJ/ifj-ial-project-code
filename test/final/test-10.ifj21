@@ -1,0 +1,28 @@
+-- Progam 10: Zanorene ify
+require "ifj21"
+
+function main()
+    local a : integer = 2
+    if a > 0 then
+        local a : integer = 3
+        write(a, "\n")
+    else
+        write(a, "\n")
+    end
+
+    local b : integer = a
+    if b >= a then 
+        b = b + a
+        if b > a then
+            if nil then
+            else
+                write(b, "\n")
+            end
+        else
+            write(a, b+2, "\n")
+        end
+    else
+        a = b * b
+    end
+    write(a + b)
+end

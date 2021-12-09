@@ -1,0 +1,12 @@
+ -- Program 15 (nil v parametru substr() - chyba 8)  
+require "ifj21"
+function main()
+  local s1 : string = "Hello"
+  local s2 : string
+  local x : integer = 1 
+  local y : integer
+
+  s2 = substr(s1, x, y)
+end
+main()
+
